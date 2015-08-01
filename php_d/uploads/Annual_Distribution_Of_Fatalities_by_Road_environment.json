@@ -1,0 +1,128 @@
+[
+    {
+        "Year": 1991,
+        "Urban": 266,
+        "Non-urban": 644,
+        "Total": 910
+    },
+    {
+        "Year": 1992,
+        "Urban": 317,
+        "Non-urban": 587,
+        "Total": 904
+    },
+    {
+        "Year": 1993,
+        "Urban": 299,
+        "Non-urban": 596,
+        "Total": 895
+    },
+    {
+        "Year": 1994,
+        "Urban": 287,
+        "Non-urban": 523,
+        "Total": 810
+    },
+    {
+        "Year": 1995,
+        "Urban": 438,
+        "Non-urban": 587,
+        "Total": 1025
+    },
+    {
+        "Year": 1996,
+        "Urban": 401,
+        "Non-urban": 647,
+        "Total": 1048
+    },
+    {
+        "Year": 1997,
+        "Urban": 386,
+        "Non-urban": 627,
+        "Total": 1013
+    },
+    {
+        "Year": 1998,
+        "Urban": 519,
+        "Non-urban": 894,
+        "Total": 1413
+    },
+    {
+        "Year": 1999,
+        "Urban": 396,
+        "Non-urban": 840,
+        "Total": 1236
+    },
+    {
+        "Year": 2000,
+        "Urban": 504,
+        "Non-urban": 1072,
+        "Total": 1576
+    },
+    {
+        "Year": 2001,
+        "Urban": 521,
+        "Non-urban": 1136,
+        "Total": 1657
+    },
+    {
+        "Year": 2002,
+        "Urban": 512,
+        "Non-urban": 1149,
+        "Total": 1661
+    },
+    {
+        "Year": 2003,
+        "Urban": 528,
+        "Non-urban": 1203,
+        "Total": 1731
+    },
+    {
+        "Year": 2004,
+        "Urban": 642,
+        "Non-urban": 1530,
+        "Total": 2172
+    },
+    {
+        "Year": 2005,
+        "Urban": 573,
+        "Non-urban": 1210,
+        "Total": 1783
+    },
+    {
+        "Year": 2006,
+        "Urban": 610,
+        "Non-urban": 1246,
+        "Total": 1856
+    },
+    {
+        "Year": 2007,
+        "Urban": 788,
+        "Non-urban": 1253,
+        "Total": 2041
+    },
+    {
+        "Year": 2008,
+        "Urban": 605,
+        "Non-urban": 1333,
+        "Total": 1938
+    },
+    {
+        "Year": 2009,
+        "Urban": 681,
+        "Non-urban": 1556,
+        "Total": 2237
+    },
+    {
+        "Year": 2010,
+        "Urban": 677,
+        "Non-urban": 1309,
+        "Total": 1986
+    },
+    {
+        "Year": 2011,
+        "Urban": 668,
+        "Non-urban": 1531,
+        "Total": 2199
+    }
+]

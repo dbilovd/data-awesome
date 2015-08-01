@@ -12,15 +12,20 @@ file <- NULL
 if (length(args) > 0) {
 	file <- args[1]
 }
-# Graph type
-type <- NULL
+# Output director
+output <- NULL
 if (length(args) > 1) {
-	type <- args[2]
+	output <- args[2]
+}
+# Graph type
+type <- "line"
+if (length(args) > 2) {
+	type <- args[3]
 }
 # Colx
 colX <- NULL
-if (length(args) > 2) {
-	colX <- args[3]
+if (length(args) > 3) {
+	colX <- args[4]
 }
 # ColY
 colY <- NULL
@@ -32,7 +37,7 @@ if (length(args) > 3) {
 # generateGraph
 # Generate a graph
 #
-generateGraph <- function (file, type = "line",  colX = NULL, colY = NULL) {
+generateGraph <- function (file, output = NULL, type = "line", colX = NULL, colY = NULL) {
 	# Require packages
     require(ggplot2) # Ploting graphs
     require(lubridate) # Manipulating date values
@@ -93,12 +98,20 @@ generateGraph <- function (file, type = "line",  colX = NULL, colY = NULL) {
 
     # file and dir name
     fileName <- basename(file)
-    dirName <- dirname(file)
+    if (length(output) == 0) {
+    	print ("in here")
+    	dirName <- dirname(file)
+    	output <- paste(dirname, "generated", fileName, ".png", sep = "")
+    } else {
+    	# print ("out here")
+    	output <- paste(output, "/", fileName, ".png", sep = "")
+    }
 
     # save as image
-    ggsave(paste(dirName, "/generated/", fileName, ".png", sep = ""), width = 10, height = 6)
+    ggsave(output, width = 10, height = 6)
 
+    return(output)
 }
 
 # Generate Graph
-generateGraph(file, type, colX, colY)
+generateGraph(file, output, type, colX, colY)
