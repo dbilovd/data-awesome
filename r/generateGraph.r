@@ -77,10 +77,12 @@ generateGraph <- function (file, type = "line",  colX = NULL, colY = NULL) {
 	# Plot Graph
     plot
 
-    # file name
+    # file and dir name
     fileName <- basename(file)
+    dirName <- dirname(file)
+
     # save as image
-    ggsave(paste(fileName, ".png", sep = ""), width = 10, height = 6)
+    ggsave(paste(dirName, "/generated/", fileName, ".png", sep = ""), width = 10, height = 6)
 
 }
 
