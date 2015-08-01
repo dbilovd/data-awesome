@@ -12,7 +12,21 @@ file <- NULL
 if (length(args) > 0) {
 	file <- args[1]
 }
-
+# Graph type
+type <- NULL
+if (length(args) > 1) {
+	type <- args[2]
+}
+# Colx
+colX <- NULL
+if (length(args) > 2) {
+	colX <- args[3]
+}
+# ColY
+colY <- NULL
+if (length(args) > 3) {
+	colY <- args[4]
+}
 
 #
 # generateGraph
@@ -87,4 +101,4 @@ generateGraph <- function (file, type = "line",  colX = NULL, colY = NULL) {
 }
 
 # Generate Graph
-generateGraph(file)
+generateGraph(file, type, colX, colY)
