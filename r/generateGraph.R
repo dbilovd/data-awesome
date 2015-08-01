@@ -66,20 +66,25 @@ generateGraph <- function (file, output = NULL, type = "line", colX = NULL, colY
     	colX <- readDataColumns[1]
     }
     if (length(colY) == 0) {
-    	colY <- readDataColumns[2]
+	    if (length(readDataColumns) > 2) {
+	    	colY <- "Fields"
+	    } else {
+    		colY <- readDataColumns[2]
+	    }
     }
 
     # Prepare data and graph
     plot <- NULL
+
     if ( type == "bar") { # Bar chat
 	    # Melt Data and plot with melted 
-	    df <- melt(df, id = colX)
-    	plot <- ggplot(df, aes_string(x = colX, y = "value", fill = "variable"))
+	    df <- melt(df, id = colX, value.name = "Values", variable.name = colY)
+    	plot <- ggplot(df, aes_string(x = colX, y = "Values", fill = colY))
     } else { # DEFAULT: line
     	# Plot multple lines too
 	    # Melt Data
-	    df <- melt(df, id = colX)
-    	plot <- ggplot(df, aes_string(x = colX, y = "value", colour = "variable", group = "variable"))
+	    df <- melt(df, id = colX, value.name = "Values", variable.name = colY)
+	    plot <- ggplot(df, aes_string(x = colX, y = "Values", colour = colY, group = colY))
     }
 
     # smooth disabled for now
@@ -96,15 +101,17 @@ generateGraph <- function (file, output = NULL, type = "line", colX = NULL, colY
 	# Plot Graph
     plot
 
-    # file and dir name
+    # file name without extension
     fileName <- basename(file)
+    fileName <- strsplit(fileName, "\\.")[[1]][1]
+
+    # Upload directore
     if (length(output) == 0) {
-    	print ("in here")
     	dirName <- dirname(file)
     	output <- paste(dirname, "generated", fileName, ".png", sep = "")
     } else {
     	# print ("out here")
-    	output <- paste(output, "/", fileName, ".png", sep = "")
+    	output <- paste(output, "/", fileName, "_", type, ".png", sep = "")
     }
 
     # save as image
