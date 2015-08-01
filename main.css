@@ -1,19 +1,15 @@
-
 body {
 	background-image: url('2.jpg');
 	background-repeat: no-repeat;
 	font: 180%/0.0 "Roboto", Verdana, sans-serif;
 	font-family: Roboto, Verdana, sans-serif;
-	color: #fff;
-	vertical-align: top;
+	color: #fbcab3;
+	vertical-align: center;
 }
-.grid {
-	margin: 0px 31% 0px 35%;
-	color: #fff;
-}
-.hero {
-	padding: 15% 0% 3% 0px;
+.awe {
+	margin: 0px 32% 0px 37%;
+	padding: 3% 15% 3% 15px;
 }
 .new {
-	padding: 5% 5% 5% 15%;
+	padding: 10% 15% 10% 37%;
 }
