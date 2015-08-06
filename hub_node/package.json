@@ -1,0 +1,18 @@
+{
+  "name": "data-awesome-hub",
+  "version": "0.0.1",
+  "description": "A Hub for uploading, storing, managing, sharing and analysing open data",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dbilovd/data-awesome"
+  },
+  "author": "David Lartey",
+  "dependencies": {
+    "express": "^4.13.2",
+    "multer": "^1.0.1"
+  }
+}
