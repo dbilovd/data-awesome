@@ -104,6 +104,8 @@ generateGraph <- function (file, output = NULL, type = "line", colX = NULL, colY
     # file name without extension
     fileName <- basename(file)
     fileName <- strsplit(fileName, "\\.")[[1]][1]
+    fileName <- paste(Sys.time(), "_", fileName, sep = "")
+    print (fileName)
 
     # Upload directore
     if (length(output) == 0) {
@@ -114,8 +116,9 @@ generateGraph <- function (file, output = NULL, type = "line", colX = NULL, colY
     	output <- paste(output, "/", fileName, "_", type, ".png", sep = "")
     }
 
+
     # save as image
-    ggsave(output, width = 10, height = 6)
+    # ggsave(output, width = 10, height = 6)
 
     return(output)
 }
