@@ -25,7 +25,7 @@ class DSController extends Controller
         //
         $allDS = Dataset::all();
         foreach ($allDS as $key => $dataset) {
-            echo "<a href='{$dataset -> id}'> " . (($dataset -> title) ? $dataset -> title : $dataset -> id) . " </a><br />";
+            echo "<a href='/data/{$dataset -> id}'> " . (($dataset -> title) ? $dataset -> title : $dataset -> id) . " </a><br />";
         }
         exit();
     }
@@ -67,6 +67,7 @@ class DSController extends Controller
                 $title = ($title == "") ? $file -> getClientOriginalName() : $title;
                 // Save dataset
                 $new_data_set = new Dataset();
+                $new_data_set -> owner = $request -> user() -> id;
                 $new_data_set -> title = $title;
                 $new_data_set -> description = $description;
                 $new_data_set -> file = $filename;
