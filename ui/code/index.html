@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Data-Awesome Widget</title>
+        <link href="css/skeleton.css" rel="stylesheet" type="text/css" />
+        <link href="css/normalize.css" rel="stylesheet" type="text/css" />
+        <link href="css/app.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        
+        <nav>
+            <div class="container">
+                Header
+            </div>
+        </nav>
+        
+        <div class="container">
+            
+            <!-- widget -->
+            <div class="da-widget">
+                <div class="row">
+                    <div class="one-half column">
+                        <div class="da-column-header">
+                            <h5> Configure </h5>
+                        </div>
+                        <div class="da-widget-form">
+                            <form>
+                                <div class="row">
+                                    <div class="twelve columns">
+                                        <label> Type of graph </label>
+                                        <select class="u-full-width" id="graph-type">
+                                            <option value="bar"> Bar Graph </option>
+                                            <option value="scatter"> Scatter points </option>
+                                            <option value="line"> Line </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="da-update-preview">
+                            <button class="button"> Update Preview > </button>
+                        </div>
+                    </div>
+                    <div class="one-half column">
+                        <div class="da-column-header">
+                            <h5> Preview </h5>
+                        </div>
+                        <div class="da-preview-canvas">
+                            <p> Full Preview comes here! </p>
+                        </div>
+                    </div>
+                </div>
+                <!--   -->
+                <div class="row da-widget-main-controls">
+                    <div class="twelve column">
+                        <button class="button button-primary"> Save </button>
+                        <button > Cancel </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+    </body>
+</html>
