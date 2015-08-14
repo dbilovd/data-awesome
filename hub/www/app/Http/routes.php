@@ -59,8 +59,14 @@ Route::get("/{username}", [
 	"uses" =>  "UserController@show"
 ]);
 
-// 
+// Datasets
 Route::get("/{username}/{ds_name}", [
 	"as" => "dataset",
 	"uses" => "DSController@show"
+]);
+
+// Widgets
+Route::get("/{username}/widgets/{widget}", [
+	"as" => "widget",
+	"uses" => "WidgetController@show"
 ]);

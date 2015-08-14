@@ -28,6 +28,25 @@
             <?php endforeach;  ?>
         </ul>
 
+        <hr />
+
+        <h3> Widgets </h3>
+
+        <ul>
+        
+            <?php foreach ($widgets as $widget) : ?>
+
+                <li>
+                    <h4>
+                        <a href="<?php echo route("widget", ["username" => $user -> name, "widget" => $widget -> id ]); ?>">
+                            <?php echo $widget -> title; ?>
+                        </a>
+                    </h4>
+                </li>
+
+            <?php endforeach;  ?>
+        </ul>
+
     </div>
     
 @endsection

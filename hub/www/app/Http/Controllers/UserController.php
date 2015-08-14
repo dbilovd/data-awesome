@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 use App\Dataset;
 use App\User;
+use App\Widget;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -104,13 +105,17 @@ class UserController extends Controller
 
             // Fetch dataset by name and owner
             $datasets = Dataset::where("owner", $user -> id)
-                    -> get();
+                        -> get();
+            // Widgets
+            $widgets = Widget::where("owner", $user -> id)
+                        -> get();
 
             if ($datasets) {
                 // Return user profile
                 return view("app.user-profile")
                         -> with("user", $user)
-                        -> with("datasets", $datasets);
+                        -> with("datasets", $datasets)
+                        -> with("widgets", $widgets);
             }
         }
         

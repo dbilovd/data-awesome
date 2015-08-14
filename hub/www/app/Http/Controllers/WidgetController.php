@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Dataset;
 use App\Widget;
+use App\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -46,10 +47,37 @@ class WidgetController extends Controller
         /**
          * @todo Add validation
          */
+        $validation = $this -> validate($request,
+            [
+                "w-data" => "required",
+                "w-title" => "required",
+                "w-graph-type" => "required",
+            ]
+        );
+
         // Data source
-        $widget_data_id = $request -> input("widget-data");
+        $widget_data_id = $request -> input("w-data");
         $widget_data = Dataset::find($widget_data_id);
+        $widget_title = $request -> input("w-title");
         if ($widget_data) {
+            
+            $new_widget = new Widget();
+            $new_widget -> dataset = $widget_data -> id;
+            $new_widget -> owner = $request -> user() -> id;
+            $new_widget -> title = $widget_title;
+            
+            if ($new_widget -> save()) {
+                // Go the the widget page
+                return redirect() -> route("widget", [
+                    "username" => $request -> user() -> name,
+                    "widget" => $new_widget -> id
+                ]);
+            } else {
+                return "Failed to save widget";
+            }
+            
+
+            /*
             // Widget queries
             $widget_query_graph = $request -> input("widget-query-graph");
 
@@ -84,7 +112,7 @@ class WidgetController extends Controller
                                 }
                             }
                         }
-                        */
+                        *\/
 
             # Execute
             # Final command should : Rscript [generateGraph.R] [data source] [output location] [type] [colX] [colY]
@@ -93,16 +121,11 @@ class WidgetController extends Controller
             $command = $command . " " . implode(" ", $command_arguments);
             // print $command; exit();
             exec($command, $output);
-            
-            /*
-            $new_widget = new Widget();
-            $new_widget -> dataset = $widget_data -> id;
-            $new_query -> 
             */
+            
         } else {
             return "Data set not found";
         }
-
     }
 
     /**
@@ -111,10 +134,25 @@ class WidgetController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
-    {
-        //
-        return "Show a specific widget";
+    public function show ($username, $widget_id) {
+        // Get widget owner
+        $owner = User::where("name", $username) -> first();
+        if ($owner) {
+
+            // Fetch widget by owner
+            $widget = Widget::where("owner", $owner -> id)
+                -> where("id", $widget_id)
+                -> first();
+
+            if ($widget) {
+                return view("app.widget-details")
+                    -> with("owner", $owner)
+                    -> with("widget", $widget);
+            }
+        }
+
+        // Throw 404 error
+        abort(404);
     }
 
     /**

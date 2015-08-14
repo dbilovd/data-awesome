@@ -92,6 +92,7 @@ return [
             'rule-name' => 'custom-message',
         ],
         */
+        // Data source
         "ds-name" => [
             "required" => "A name is required when creating a new dataset.",
             "max" => "The name is longer than our servers can understand"
@@ -102,6 +103,16 @@ return [
         ],
         "ds-file" => [
             "required" => "Everything here is nothing without your data file"
+        ]
+        // Widget
+        "w-data" => [
+            "required" => "A widget without a datasource is like a car without an engine."
+        ],
+        "w-title" => [
+            "required" => "Yes again, people have to see your car's number plate, right?"
+        ],
+        "w-graph-type" => [
+            "required" => "A widget needs its graph type as a car needs a body."
         ]
     ],
 

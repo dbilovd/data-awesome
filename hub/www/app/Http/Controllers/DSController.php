@@ -51,7 +51,7 @@ class DSController extends Controller
     public function store(Request $request)
     {
         /**
-         * @todo Perform validation
+         * @todo Further enhance validation
          */
         $validation = $this -> validate($request,
             [
