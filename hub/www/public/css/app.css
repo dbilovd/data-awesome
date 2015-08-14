@@ -14,6 +14,10 @@ nav {
     margin-bottom: 10px;
 }
 
+label span.description {
+    font-weight: normal;
+}
+
 /**
  * DA
  */

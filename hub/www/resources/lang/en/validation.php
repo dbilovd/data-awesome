@@ -87,9 +87,22 @@ return [
     */
 
     'custom' => [
+        /*
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        */
+        "ds-name" => [
+            "required" => "A name is required when creating a new dataset.",
+            "max" => "The name is longer than our servers can understand"
+        ],
+        "ds-title" => [
+            "required" => "Without a title no one can see your dataset's name",
+            "max" => "This title is longer than our servers can understand"
+        ],
+        "ds-file" => [
+            "required" => "Everything here is nothing without your data file"
+        ]
     ],
 
     /*

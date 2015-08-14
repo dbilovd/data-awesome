@@ -14,7 +14,7 @@ use App\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class DSController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -53,13 +53,6 @@ class DSController extends Controller
         /**
          * @todo Perform validation
          */
-        $validation = $this -> validate($request,
-            [
-                "ds-name" => "required|max:255",
-                "ds-title" => "required|max:255",
-                "ds-file" => "required"
-            ]
-        );
 
         // Get form data
         $ds_name = $request -> input("ds-name");
@@ -104,41 +97,25 @@ class DSController extends Controller
      * @param  string $dataset_name
      * @return Response
      */
-    public function show($username, $dataset_name) {
+    public function show($username) {
         // Get dataset owner
-        $owner = User::where("name", $username) -> first();
-        if ($owner) {
+        $user = User::where("name", $username) -> first();
+        if ($user) {
 
             // Fetch dataset by name and owner
-            $ds = Dataset::where("name", $dataset_name)
-                    -> where("owner", $owner -> id)
-                    -> first();
+            $datasets = Dataset::where("owner", $user -> id)
+                    -> get();
 
-            if ($ds) {
-                // Return Display dataset details
-                return view("app.data-details")
-                        -> with("owner", $owner)
-                        -> with("dataset", $ds);
+            if ($datasets) {
+                // Return user profile
+                return view("app.user-profile")
+                        -> with("user", $user)
+                        -> with("datasets", $datasets);
             }
         }
         
         // Throw 404 if it gets to this point.
         abort(404);
-
-        // Show single data se
-        echo "Fetching Dataset: " . $id . "<br />";
-
-        $dataset = Dataset::find($id);
-        if ($dataset) {
-            echo "<h1>" . (($dataset -> title) ? $dataset -> title : $dataset -> id) . "</h1>";
-            echo "<h3>" . $dataset -> file . "</h3>";
-            echo (($dataset -> description) ? "<p>" . $dataset -> description . '<p>' : "");
-            echo "<a href='edit'> Edit </a><br />";
-            echo "<a href='delete' style='color: red;'> Delete </a>";
-            return;
-        } else {
-            return "404 dataset not found";
-        }
     }
 
     /**

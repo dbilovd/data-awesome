@@ -25,15 +25,42 @@ Route::get("/home", function() {
 });
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 // Data Sets
 Route::get("data", "DSController@index");
-Route::get("data/new", "DSController@create");
-Route::post("data/new", "DSController@store");
-Route::get("data/{id}", "DSController@show");
-Route::get("data/{id}/edit", "DSController@edit");
+Route::get("data/new", [
+	"as" => "create-dataset",
+	"middleware" => "auth",
+	"uses" => "DSController@create"
+]);
+Route::post("data/new", [
+	"as" => "create-dataset-post",
+	"middleware" => "auth",
+	"uses" => "DSController@store"
+]);
 
 // Widgets
-Route::resource("widgets", "WidgetController");
+Route::get("widget/new", [
+	"as" => "create-widget",
+	"middleware" => "auth",
+	"uses" => "WidgetController@create"
+]);
+Route::post("widget/new", [
+	"as" => "create-widget-post",
+	"middleware" => "auth",
+	"uses" => "WidgetController@store"
+]);
+
+// If none of the routes matches then use the first 
+Route::get("/{username}", [
+	"as" => "profile",
+	"uses" =>  "UserController@show"
+]);
+
+// 
+Route::get("/{username}/{ds_name}", [
+	"as" => "dataset",
+	"uses" => "DSController@show"
+]);

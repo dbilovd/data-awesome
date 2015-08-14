@@ -2,15 +2,26 @@
 <html>
     <head>
         <title>Data-Awesome Widget</title>
-        <link href="css/skeleton.css" rel="stylesheet" type="text/css" />
-        <link href="css/normalize.css" rel="stylesheet" type="text/css" />
-        <link href="css/app.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo asset("css//skeleton.css"); ?>" rel="stylesheet" type="text/css" />
+        <link href="<?php echo asset("css/normalize.css"); ?>" rel="stylesheet" type="text/css" />
+        <link href="<?php echo asset("css/app.css"); ?>" rel="stylesheet" type="text/css" />
     </head>
     <body>
         
         <nav>
             <div class="container">
-                Header
+                <div class="row">
+                    <div class="three columns">
+                        <h5> Data Awesome Hub </h5>
+                    </div>
+                    <div class="nine columns" style="text-align: right">
+                        <h6>
+                            <a href="#"> + Dataset </a> &nbsp;&nbsp;
+                            <a href="#"> + Widget </a> &nbsp;&nbsp;
+                            <a href="#"> Username </a>
+                        </h6>
+                    </div>
+                </div>
             </div>
         </nav>
         
