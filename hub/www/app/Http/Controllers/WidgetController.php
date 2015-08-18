@@ -129,6 +129,26 @@ class WidgetController extends Controller
     }
 
     /**
+     * Generate graph for a widget
+     *
+     */
+    public function create_graph (Request $request, $widget_id) {
+        // Fetch widget if by current user
+        $widget = Widget::where("id", $widget_id)
+                    -> where("owner", $request -> user() -> id)
+                    -> first();
+
+        if ($widget) {
+            return view("app.widget-graph")
+                -> with("owner", $request -> user())
+                -> with("widget", $widget);
+        }
+
+        // Throw 404
+        abort(404);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id

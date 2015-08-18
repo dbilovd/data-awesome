@@ -52,6 +52,11 @@ Route::post("widget/new", [
 	"middleware" => "auth",
 	"uses" => "WidgetController@store"
 ]);
+Route::get("widget/{widget}/graph", [
+	"as" => "edit-widget-graph",
+	"middleware" => "auth",
+	"uses" => "WidgetController@create_graph"
+]);
 
 // If none of the routes matches then use the first 
 Route::get("/{username}", [

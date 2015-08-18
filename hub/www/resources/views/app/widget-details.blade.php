@@ -16,8 +16,13 @@
             <a href="<?php echo route("widget", ["username" => $owner -> name, "widget" => $widget -> id ]); ?>">
                 <?php echo $widget -> title; ?>
             </a>
-
         </h4>
+
+        <h6>
+            <a href="<?php echo route('edit-widget-graph', [ 'widget' => $widget -> id ]); ?>"> 
+                Maintain graph 
+            </a>
+        </h6>
 
     </div>
     

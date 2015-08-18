@@ -18,25 +18,40 @@ label span.description {
     font-weight: normal;
 }
 
+/* Utilites */
+.da-text-right {
+    text-align: right;
+}
+.da-text-left {
+    text-align: left;
+}
+.da-text-center {
+    text-align: center;
+}
+
 /**
  * DA
  */
 .da-widget .row {
     margin-bottom: 20px;
 }
+/*
 .da-widget .column {
     border: 1px solid #eeeeee;
     border-radius: 5px;
 }
+*/
 
 .da-column-header {
     border-bottom: 1px solid #E7E7E7;
     padding-top: 10px;
-    text-align: center;
 }
 
 .da-widget-form {
     padding: 10px;
+}
+
+.da-widget-graph-form {
 }
 
 .da-update-preview {
@@ -45,8 +60,9 @@ label span.description {
     text-align: right;
 }
 
-
 .da-preview-canvas {
+    padding: 20px;
+    text-align: center;
 }
 
 .da-widget-main-controls .column {
