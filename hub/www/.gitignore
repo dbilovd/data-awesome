@@ -2,3 +2,7 @@
 /node_modules
 Homestead.yaml
 .env
+
+
+# david
+.brackets.json

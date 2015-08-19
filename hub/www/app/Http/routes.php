@@ -58,6 +58,12 @@ Route::get("widget/{widget}/graph", [
 	"uses" => "WidgetController@create_graph"
 ]);
 
+// Widget's embed
+Route::get("/js/embed.html/{widget_id}", [
+    "as" => "embed-widget",
+    "uses" => "EmbedController@show"
+]);
+
 // If none of the routes matches then use the first 
 Route::get("/{username}", [
 	"as" => "profile",
