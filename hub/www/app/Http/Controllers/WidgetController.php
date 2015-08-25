@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Storage;
+
 use App\Dataset;
 use App\Widget;
 use App\User;
@@ -198,6 +200,54 @@ class WidgetController extends Controller
     {
         //
         return "Save edited widget";
+    }
+
+    /**
+     * Update the widget graph query configuration to db
+     *
+     * @param  Request  $request
+     * @param  int  $widget_id
+     * @return Response
+     */
+    public function update_graph (Request $request, $widget_id) {
+
+        // Fetch widget if by current user
+        $widget = Widget::where("id", $widget_id)
+                    -> where("owner", $request -> user() -> id)
+                    -> first();
+
+        if ($widget) {
+
+            $widget -> query = $request -> input("_data");
+            /**
+             * Save svg image
+             */
+            // construct storage path
+            $file_name = $widget -> owner . "_" . $widget -> id . "_" . time();
+            // Create new directory to hold this file
+            Storage::makeDirectory("graphs/" . $file_name);
+            // Final file path
+            $file_name = "graphs/" . $file_name . "/" . $file_name . ".svg";
+            // Save file
+            if (Storage::put($file_name, $request -> input("_data_xml"))) {
+                // Update widget with file path
+                $widget -> image = $file_name;
+            }
+
+            if ($widget -> save()) {
+                // Redirect to widget page
+                return redirect() -> route("widget", [
+                    "username" => $request -> user() -> name,
+                    "widget" => $widget -> id
+                ]);
+
+            } else {
+                return "Failed to save";
+            }
+        }
+
+        // Throw 404
+        abort(404);
     }
 
     /**

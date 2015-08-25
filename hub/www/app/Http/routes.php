@@ -57,7 +57,18 @@ Route::get("widget/{widget}/graph", [
 	"middleware" => "auth",
 	"uses" => "WidgetController@create_graph"
 ]);
+// Save widget graph settings
+Route::post("widget/{widget}/graph", [
+	"as" => "save-widget-graph",
+	"middleware" => "auth",
+	"uses" => "WidgetController@update_graph"
+]);
 
+// Widget's image
+Route::get("/js/embed.html/{widget_id}/image", [
+	"as" => "get-embed-widget-image",
+	"uses" => "EmbedController@show_image"
+]);
 // Widget's embed
 Route::get("/js/embed.html/{widget_id}", [
     "as" => "embed-widget",

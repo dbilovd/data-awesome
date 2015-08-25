@@ -3,6 +3,7 @@
 	<head>
 		<title></title>
 		<style>
+		/*
 		html, body {
 			height: 100%;
 		}
@@ -16,11 +17,11 @@
 			margin: 3px 0;
 			font-weight: bold;
 		}
-		/* Widget style */
+		/* Widget style *\/
 		.main {
-			height: 98%;
-			border: 1px solid #000000;
-			border-radius: 5px;
+			height: 100%;
+			/*border: 1px solid #000000;*/
+			/*border-radius: 5px;*\/
 		}
 		.main > div {
 			padding: 10px;
@@ -35,36 +36,44 @@
 		}
 		.txt-right {
 			text-align: right;
+		}*/
+		.header, .content, .footer {
+			position: absolute;
+			left: 0;
+			right: 0;
+		}
+		.header {
+			height: 49px;
+			background-color: gray;
+			border-bottom: 1px solid;
+			top: 0;
+		}
+		.content {
+			top: 49px;
+			bottom: 49px;
+			overflow: auto;
+		}
+		.footer {
+			height: 49px;
+			background-color: gray;
+			border-top: 1px solid;
+			bottom: 0;
 		}
 		</style>
 	</head>
 	<body>
-		<div class="main">
-			<div style="border-bottom: 1px solid black;"> 
-				<h3> <?php echo $widget -> title; ?> </h3>
-			</div>
-			<div>
-				<div>
-					<img src="<?php echo asset("img/test.png"); ?>" width="100%" />
-				</div>
-			</div>
-			<div style="
-				border-top: 1px solid black;
-				position : fixed;
-				left: 0;
-				bottom: 0;
-				width: 100%;
-			">
-				<!-- <div class="half txt-left"> -->
-					<a href="<?php echo route("widget", [ 'widget' => $widget -> id, 'username' => $owner -> name	]); ?>" 
-						target="_blank">
-						View on Datawesome
-					</a>
-				<!-- </div> -->
-				<!-- <div class="half txt-right" style="float: right;"> -->
-					<a href="#"> Share on twitter </a>
-				<!-- </div> -->
-			</div>
+		<div class="header">
+			<h4> <?php echo $widget -> title; ?> </h4>
+		</div>
+		<div class="content">
+			<img src="<?php echo route("get-embed-widget-image", [ "widget_id" => $widget -> id ]); ?>" width="100%" >
+		</div>
+		<div class="footer">
+			<a href="<?php echo route("widget", [ 'widget' => $widget -> id, 'username' => $owner -> name	]); ?>" 
+					target="_blank">
+					View on Datawesome
+			</a>
+			<a href="#"> Share on twitter </a>
 		</div>
 	</body>
 </html>

@@ -18,7 +18,8 @@
                     </div>
                 @endif
 
-                <form id="widget-form" method="POST" action="" enctype="multipart/form-data">
+                <form id="widget-form" method="POST" action="<?php echo route("save-widget-graph", [ "widget" => $widget -> id ]) ?>"
+                    enctype="multipart/form-data" >
 
                     <div class="row">
                         <div class="three columns">
@@ -59,23 +60,22 @@
                                     <h5> Preview </h5>
                                 </div>
                                 <div class="one-half column">
-                                    <button class="button button-primary u-pull-right"> Save Widget </button>
+                                    <button id="w-save-widget" type="submit" class="button button-primary u-pull-right"> Save Widget </button>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="twelve columns">
-                                    <div id="da-preview-canvas" class="da-preview-canvas da-text-center">
-                                        <!-- <svg height="200" width="400" style="border: 1px solid;">
-                                            <circle cx="200" cy="100" r="50"> </circle>
-                                        </svg> -->
-                                    </div>
+                                    <div id="da-preview-canvas" class="da-preview-canvas da-text-center"> </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" id="w_data" name="_data" value="" />
+                    <input type="hidden" id="w_data_xml" name="_data_xml" value="" />
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                 </form>    
+
             </div>
 
         </div>
