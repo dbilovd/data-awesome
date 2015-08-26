@@ -10,6 +10,7 @@ define(["jquery", "d3"], function($, d3) {
 	  //           [5, 20], [480, 90], [250, 50], [100, 33], [330, 95], [410, 12], [475, 44], [25, 67], [85, 21],
 	  //           [220, 88],
 	  //       ];
+    
 
     var Awesome = {
         // Query for graph
@@ -30,6 +31,10 @@ define(["jquery", "d3"], function($, d3) {
 
         // App entry point
         start : function () {
+            
+            // Sample data file
+            this.dataFile = $("#w_data_file").data("file");
+            
             // self
             var self = this;
 

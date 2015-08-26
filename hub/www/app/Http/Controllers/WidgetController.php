@@ -141,9 +141,18 @@ class WidgetController extends Controller
                     -> first();
 
         if ($widget) {
-            return view("app.widget-graph")
-                -> with("owner", $request -> user())
-                -> with("widget", $widget);
+            // Fetch Dataset
+            $dataset = Dataset::where("id", $widget -> dataset) -> first();
+
+            if ($dataset) {
+                // Return view
+                return view("app.widget-graph")
+                    -> with("owner", $request -> user())
+                    -> with("dataset", $dataset)
+                    -> with("widget", $widget);
+            } else {
+                return "Failed to fetch dataset";
+            }
         }
 
         // Throw 404

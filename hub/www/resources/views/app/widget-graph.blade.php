@@ -71,6 +71,7 @@
                         </div>
                     </div>
 
+                    <input type="hidden" id="w_data_file" value="<?php echo base_path() . "/storage/app/uploads/ds" . $dataset -> file; ?>" />
                     <input type="hidden" id="w_data" name="_data" value="" />
                     <input type="hidden" id="w_data_xml" name="_data_xml" value="" />
                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
