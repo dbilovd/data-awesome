@@ -51,20 +51,27 @@
                     <div class="row">
                         <div class="one columns"> &nbsp; </div> <!-- hack to center form -->
                         <div class="ten columns form-container">
-                            <h5> Create a Widget </h5>
+                            <h5> Upload Dataset </h5>
                             
                             <form>
                                 <div class="row">
                                     <div class="twelve column">
                                         <label>
-                                            Dataset
-                                            <span class="form-help"> Choose the data this widget would visualise. </span>
+                                            Datafile
+                                            <span class="form-help"> Upload a .json file containing your data.</span>
                                         </label>
-                                        <select class="">
-                                            <option> Select a Dataset names </option>
-                                            <option> First DS </option>
-                                            <option> Second DS </option>
-                                        </select>
+                                        <input type="file" class="u-full-width" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="twelve column">
+                                        <label>
+                                            Name for Url
+                                            <span class="form-help"> 
+                                                Short and memorable text so people can access your project at <em> your-username/my-awesome-dataset</em> 
+                                            </span>
+                                        </label>
+                                        <input type="email" placeholder="my-awesome-dataset" />
                                     </div>
                                 </div>
                                 <div class="row">
@@ -72,15 +79,26 @@
                                         <label>
                                             Title
                                             <span class="form-help">
-                                                Describe your widget in a few words.
+                                                The last had to be short and memorable but this doesn't. Give a name that describes your project.
                                             </span>
                                         </label>
-                                        <input type="text" placeholder="Proof of how awesome our data is" class="u-full-width" />
+                                        <input type="text" placeholder="My Very Awesome Dataset" class="u-full-width" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="twelve column">
-                                        <button class="button-primary" type="submit"> Save Widget </button>
+                                        <label>
+                                            Description
+                                            <span class="form-help">
+                                                Tell the world how awesome your project is.
+                                            </span>
+                                        </label>
+                                        <textarea class="u-full-width"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="twelve column">
+                                        <button class="button-primary" type="submit"> Upload Dataset </button>
                                     </div>
                                 </div>
                             </form>

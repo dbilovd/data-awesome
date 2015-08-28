@@ -1,16 +1,102 @@
 /**
  * General overrides
  */
+html, body {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    font-family: 'Fira Sans', sans-serif;
+}
+
 button,
 button.button {
     margin-bottom: 0;
 }
 
-nav {
+form .row {
+    margin-bottom: 20px;
+}
+
+form .form-help {
+    display: block;
+    font-weight: normal;
+}
+
+.row .form-container {
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.main {
+    min-height: 100%;
+    margin-bottom: -75px;
+}
+
+.main > div.clear {
+    height: 75px; /* same value as footer height and main negative margin bottom */
+}
+
+.navbar {
     border-bottom: 1px solid #e7e7e7;
     height: 30px;
     padding-bottom: 10px;
     padding-top : 10px;
+    margin-bottom: 10px;
+}
+
+.navbar h5 {
+    margin-bottom: 0;
+}
+
+ul.menu {
+    list-style: none;
+    margin-bottom: 0;
+}
+
+ul.menu li.menu-item {
+    display: inline-block;
+    padding: 2px 5px;
+    margin-bottom: 0;
+}
+
+ul.menu li.menu-divider {
+    width: 20px;
+}
+
+.navbar ul.menu li.menu-item {
+    padding-right: 10px;
+}
+.navbar ul.menu li.menu-item:last-child {
+    padding-right: 0;
+}
+
+ul.menu li.menu-item a {
+    text-decoration: none;
+}
+
+.sub-navbar {
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.sub-navbar h5 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.content {
+    padding-top: 30px;
+}
+
+footer {
+    border-top: 1px solid #e7e7e7;
+    margin-top: 20px;
+}
+
+footer .container {
+    text-align: center;
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
@@ -40,7 +126,6 @@ nav {
     padding: 10px;
     text-align: right;
 }
-
 
 .da-preview-canvas {
 }
