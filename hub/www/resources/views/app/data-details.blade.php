@@ -4,32 +4,34 @@
 @section("head.title", $dataset -> title)
 
 
+@section("body.subheader")
+
+    <div class="sub-navbar">
+        <div class="container">
+            <div class="row">
+                <div class="twelve columns">
+                    <h5>
+                        <a href='{{ route("profile", ["username" => $owner -> name ]) }}'>{{ $owner -> name }}</a> 
+                        /
+                        <a href="{{ route("dataset", ["username" => $owner -> name, "dataset" => $dataset -> name ]) }}">{{ $dataset -> name }}</a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+
 @section("body.main")
 
     <div class="row">
+        <div class="twelve columns">
 
-        <h4>
-            <a href="<?php echo route("profile", ["username" => $owner -> name ]); ?>">
-                <?php echo $owner -> name; ?>
-            </a>
-            /
-            <a href="<?php echo route("dataset", ["username" => $owner -> name, "dataset" => $dataset -> name ]); ?>">
-                <?php echo $dataset -> name; ?>
-            </a>
-        </h4>
+            <h5> {{ $dataset -> title }} </h5>
 
-        <h3> <?php echo $dataset -> title; ?> </h3>
-
-        <?php echo $dataset -> description ? "<p>" . $dataset -> description . "</p>" : ""; ?>
-        
-        <hr />
-
-        <h5>
             
-            <?php echo "" . $dataset -> file; ?>
-
-        </h5>
-
+        </div>
     </div>
-    
+
 @endsection

@@ -1,31 +1,67 @@
-<!!DOCTYPE html>
-<html>
-    <head>
-        <title> Login Here </title>
-    </head>
-    <body>
 
-        <form method="POST" action="/auth/login">
-            {!! csrf_field() !!}
+@extends("layouts.base")
 
-            <div>
-                Email
-                <input type="email" name="email" value="{{ old('email') }}">
-            </div>
+@section("head.title", "Sign In")
 
-            <div>
-                Password
-                <input type="password" name="password" id="password">
-            </div>
 
-            <div>
-                <input type="checkbox" name="remember"> Remember Me
-            </div>
+@section("body.subheader")
+@endsection
 
-            <div>
-                <button type="submit">Login</button>
-            </div>
-        </form>
+
+@section("body.main")
+
+    <div class="row">
+
+        <div class="three columns"> &nbsp; </div> <!-- hack to center form -->
+        <div class="six columns form-container">
+            
+            <h5> Sign In </h5>
+            
+            <!-- TODO proper form error reporting -->
+            <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+            </ul>
+                            
+            <form method="POST" action="{{ route("signin_submit") }}">
+                {!! csrf_field() !!}
+
+                <div class="row">
+                    <div class="twelve column">
+                        <label> Email </label>
+                        <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" class="u-full-width" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Password
+                            <a style="float: right;" href="#"> Forgotten?</a>
+                        </label>
+                        <input type="password" name="password" placeholder="Password" class="u-full-width" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            <input type="checkbox" name="remember" /> &nbsp;
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <button class="button-primary" type="submit"> Sign In </button>
+                        <a href="{{ route('join') }}" style="float: right;">
+                            Create a new account
+                        </a>
+                    </div>
+                </div>
+            </form>
         
-    </body>
-</html>
+        </div>
+
+    </div>
+
+@endsection

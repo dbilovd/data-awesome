@@ -3,66 +3,80 @@
 
 @section("head.title", "Create Dataset")
 
+
+@section("body.subheader")
+@endsection
+
+
 @section("body.main")
 
-        <div class="row">
-            <div class="two columns"> &nbsp; </div> <!-- hack to center cols -->
+    <div class="row">
+        
+        <div class="one columns"> &nbsp; </div> <!-- hack to center form -->
+        <div class="ten columns form-container">
+            
+            <h5> Create Dataset </h5>
+            
+            <!-- TODO proper form error reporting -->
+            <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+            </ul>
+            
+            <form method="POST" action="{{ route('create-dataset-post') }}" enctype="multipart/form-data">
+                {!! csrf_field() !!}
 
-            <div class="eight columns">
-                <h4> New Dataset </h4>
-
-                <hr />
-
-                @if (count($errors) > 0 )
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors -> all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Datafile
+                            <span class="form-help"> Upload a .json file containing your data.</span>
+                        </label>
+                        <input type="file" name="ds-file" class="u-full-width" />
                     </div>
-                @endif
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Name for Url
+                            <span class="form-help"> 
+                                Short and memorable text so people can access your project at <em> your-username/my-awesome-dataset</em> 
+                            </span>
+                        </label>
+                        <input type="text" name="ds-name" placeholder="my-awesome-dataset" value="{{ old('ds-name') }}" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Title
+                            <span class="form-help">
+                                The last one had to be short and memorable but this doesn't. Give a name that describes your project.
+                            </span>
+                        </label>
+                        <input type="text" name="ds-title" placeholder="My Very Awesome Dataset" class="u-full-width" value="{{ old('ds-title') }}" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Description
+                            <span class="form-help">
+                                Tell the world how awesome your project is.
+                            </span>
+                        </label>
+                        <textarea name="ds-description" class="u-full-width" value="{{ old('ds-description') }}" ></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <button class="button-primary" type="submit"> Upload Dataset </button>
+                    </div>
+                </div>
+            </form>
 
-                <form method="POST" action="" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="twelve columns">
-                            <label> Upload </label>
-                            <label><span class="description"> File holding your data in json </span></label>
-                            <input type="file" name="ds-file" class="u-full-width" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="twelve columns">
-                            <label> Name </label>
-                            <label><span class="description"> Your url will be username/my-awesome-dataset </span></label>
-                            <input type="text" name="ds-name" placeholder="my-awesome-dataset" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="twelve columns">
-                            <label> Title </label>
-                            <label><span class="description"> Name for humans </span></label>
-                            <input type="text" name="ds-title" placeholder="My Awesome Dataset" class="u-full-width" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="twelve columns">
-                            <label> Description <span> (optional) </span> </label>
-                            <label><span class="description"> Tell us how awesome your dataset is </span></label>
-                            <textarea name="ds-description" placeholder="My dataset is so awesome it is called 'My Awesome Dataset'" class="u-full-width"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <hr />
-
-                        <button class="button button-primary" type="submit"> Create Dataset </button>
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    </div>
-                </form>    
-            </div>
-
-            <div class="two columns"> &nbsp; </div> <!-- hack to center cols -->
         </div>
-    
+    </div>
+
 @endsection

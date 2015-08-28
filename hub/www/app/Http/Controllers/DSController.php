@@ -83,7 +83,11 @@ class DSController extends Controller
                 $new_data_set -> file = $filename;
 
                 if ($new_data_set -> save()) {
-                    return "Dataset created successfully";
+                    // Go the the widget page
+                    return redirect() -> route("dataset", [
+                        "username" => $request -> user() -> name,
+                        "ds_name" => $new_data_set -> name
+                    ]);
                 } else {
                     return "Dataset creation failed";
                 }

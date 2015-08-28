@@ -103,7 +103,7 @@ return [
         ],
         "ds-file" => [
             "required" => "Everything here is nothing without your data file"
-        ]
+        ],
         // Widget
         "w-data" => [
             "required" => "A widget without a datasource is like a car without an engine."

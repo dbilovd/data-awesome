@@ -53,7 +53,7 @@ class WidgetController extends Controller
             [
                 "w-data" => "required",
                 "w-title" => "required",
-                "w-graph-type" => "required",
+                // "w-graph-type" => "required",
             ]
         );
 

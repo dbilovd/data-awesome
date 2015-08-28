@@ -12,13 +12,28 @@
 */
 
 // Authentication routes...
-Route::get('auth/login', 'Auth\AuthController@getLogin');
-Route::post('auth/login', 'Auth\AuthController@postLogin');
-Route::get('auth/logout', 'Auth\AuthController@getLogout');
+Route::get('/signin', [
+	"as" => "signin",
+	"uses" => 'Auth\AuthController@getLogin'
+]);
+Route::post('/signin', [
+	"as" => "signin_submit",
+	"uses" => 'Auth\AuthController@postLogin'
+]);
+Route::get('/signout', [
+	"as" => "signout",
+	"uses" => 'Auth\AuthController@getLogout'
+]);
 
 // Registration routes...
-Route::get('auth/register', 'Auth\AuthController@getRegister');
-Route::post('auth/register', 'Auth\AuthController@postRegister');
+Route::get('/join', [
+	"as" => "join",
+	"uses" => 'Auth\AuthController@getRegister'
+]);
+Route::post('/join', [
+	"as" => "join_submit",
+	"uses" => 'Auth\AuthController@postRegister'
+]);
 
 Route::get("/home", function() {
 	return Auth::user();
@@ -88,6 +103,11 @@ Route::get("/{username}/{ds_name}", [
 ]);
 
 // Widgets
+Route::get("/{username}/widgets", [
+	"as" => "widgets",
+	"uses" => "WidgetController@index"
+]);
+
 Route::get("/{username}/widgets/{widget}", [
 	"as" => "widget",
 	"uses" => "WidgetController@show"

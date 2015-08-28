@@ -100,15 +100,24 @@ footer .container {
     margin-bottom: 10px;
 }
 
+/* Utilites */
+.da-text-right {
+    text-align: right;
+}
+
+.da-text-left {
+    text-align: left;
+}
+
+.da-text-center {
+    text-align: center;
+}
+
 /**
  * DA
  */
 .da-widget .row {
     margin-bottom: 20px;
-}
-.da-widget .column {
-    border: 1px solid #eeeeee;
-    border-radius: 5px;
 }
 
 .da-column-header {
@@ -121,6 +130,9 @@ footer .container {
     padding: 10px;
 }
 
+.da-widget-graph-form {
+}
+
 .da-update-preview {
     border-top: 1px solid #E7E7E7;
     padding: 10px;
@@ -128,9 +140,12 @@ footer .container {
 }
 
 .da-preview-canvas {
+    padding: 20px;
+    text-align: center;
 }
 
 .da-widget-main-controls .column {
     padding: 10px;
     text-align: right;
 }
+

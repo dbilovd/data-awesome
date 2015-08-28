@@ -1,84 +1,76 @@
 
 @extends("layouts.base")
 
-@section("head.title", "Create Widget")
+@section("head.title", "Create Dataset")
+
+
+@section("body.subheader")
+@endsection
+
 
 @section("body.main")
 
-        <div class="row">
-            <div class="two columns"> &nbsp; </div> <!-- hack to center cols -->
+    <div class="row">
+        
+        <div class="one columns"> &nbsp; </div> <!-- hack to center form -->
+        <div class="ten columns form-container">
+            
+            <h5> Create a Widget </h5>
+            
+            <!-- TODO proper form error reporting -->
+            <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+            </ul>
+            
+            <form method="POST" action="{{ route('create-widget-post') }}" enctype="multipart/form-data">
+                {!! csrf_field() !!}
+                
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Dataset
+                            <span class="form-help"> Choose the data this widget would visualise. </span>
+                        </label>
+                        
+                        <select name="w-data">
+                            <option> Select a Dataset names </option>
 
-            <div class="eight columns">
+                            @foreach ($data_sets as $dataset)
 
-                @if (count($errors) > 0 )
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors -> all() as $error)
-                                <li>{{ $error }}</li>
+                                <option value="{{ $dataset -> id }}"
+                                    @if (old('w-data') == $dataset -> id) 
+                                        selected="selected"
+                                    @endif
+                                >
+                                    {{ $dataset -> title }}
+                                </option>
+
                             @endforeach
-                        </ul>
+                        </select>
                     </div>
-                @endif
-
-                <form method="POST" action="" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="one-half column">
-                            <div class="da-column-header">
-                                <h5> Configure </h5>
-                            </div>
-                            <div class="da-widget-form">
-                                <div class="row">
-                                    <div class="twelve columns">
-                                        <label> Datasets </label>
-                                        <select name="w-data" class="u-full-width">
-                                            @foreach ($data_sets as $dataset)
-                                                <option value="{{ $dataset -> id }}">{{ $dataset -> title }} </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="twelve columns">
-                                        <label> Title </label>
-                                        <input type="text" class="u-full-width" name="w-title" placeholder="My Awesome Widget" />
-                                    </div>
-                                </div>
-                                <div class="row">
-                                        <div class="twelve columns">
-                                            <label> Type of graph </label>
-                                            <select name="w-graph-type" class="u-full-width" id="graph-type">
-                                                <option value="bar"> Bar Graph </option>
-                                                <option value="scatter"> Scatter points </option>
-                                                <option value="line"> Line </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                            </div>
-                            <div class="da-update-preview">
-                                <button class="button"> Update Preview > </button>
-                            </div>
-                        </div>
-                        <div class="one-half column">
-                            <div class="da-column-header">
-                                <h5> Preview </h5>
-                            </div>
-                            <div class="da-preview-canvas">
-                                <p> Full Preview comes here! </p>
-                            </div>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <label>
+                            Title
+                            <span class="form-help">
+                                Describe your widget in a few words.
+                            </span>
+                        </label>
+                        <input type="text" name="w-title" placeholder="Proof of how awesome our data is" value="{{ old('w-title') }}" class="u-full-width" />
                     </div>
-                    <!--   -->
-                    <div class="row da-widget-main-controls">
-                        <div class="twelve column">
-                            <button class="button button-primary"> Save Widget </button>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="twelve column">
+                        <button class="button-primary" type="submit"> Save Widget </button>
                     </div>
+                </div>
+            </form>
 
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                </form>    
-            </div>
-
-            <div class="two columns"> &nbsp; </div> <!-- hack to center cols -->
         </div>
-    
+    </div>
+
+
 @endsection
