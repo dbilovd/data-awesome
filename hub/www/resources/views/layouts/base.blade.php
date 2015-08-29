@@ -19,7 +19,7 @@
 
     </head>
     <body>
-        
+
         <div class="main">
 
             @section("body.header")
@@ -28,7 +28,7 @@
                     <div class="container">
                         <div class="row">
                             <div class="three columns">
-                                <h5> 
+                                <h5>
                                     <a href="/">
                                         DA Hub
                                     </a>
@@ -83,7 +83,7 @@
                 </nav>
 
             @show
-            
+
             @section("body.subheader")
 
                 <div class="sub-navbar">
@@ -109,10 +109,10 @@
 
                 </div>
             </div>
-            
+
             <div class="clear"> &nbsp; </div>
         </div>
-        
+
         <!-- Footer -->
         @section("body.footer")
             <footer>

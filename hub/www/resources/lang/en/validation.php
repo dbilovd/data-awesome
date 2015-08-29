@@ -106,10 +106,11 @@ return [
         ],
         // Widget
         "w-data" => [
-            "required" => "A widget without a datasource is like a car without an engine."
+            "required" => "A widget without a datasource is like a car without an engine.",
+            "min" => "A widget without a datasource is like a car without an engine."
         ],
         "w-title" => [
-            "required" => "Yes again, people have to see your car's number plate, right?"
+            "required" => "A title of a widget is required."
         ],
         "w-graph-type" => [
             "required" => "A widget needs its graph type as a car needs a body."

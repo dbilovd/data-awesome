@@ -30,10 +30,20 @@ class WidgetController extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function create(Request $request)
     {
         // Get all data sources
-        $data_sets = Dataset::all();
+        $data_sets = Dataset::where("owner", $request -> user() -> id) -> get();
+
+        // If current user has no dataset yet redirect to dataset upload form.
+        if ($data_sets -> count() <= 0) {
+            /**
+             * @todo add notification.
+             */
+            // $request -> flash("notify", "You need to upload a dataset first to be able to create a widget.");
+            return redirect() -> route("create-dataset");
+        }
+
         // Return view
         return view("app/widget-new", ["data_sets" => $data_sets]);
     }
@@ -51,7 +61,7 @@ class WidgetController extends Controller
          */
         $validation = $this -> validate($request,
             [
-                "w-data" => "required",
+                "w-data" => "required|min:1",
                 "w-title" => "required",
                 // "w-graph-type" => "required",
             ]
@@ -62,12 +72,12 @@ class WidgetController extends Controller
         $widget_data = Dataset::find($widget_data_id);
         $widget_title = $request -> input("w-title");
         if ($widget_data) {
-            
+
             $new_widget = new Widget();
             $new_widget -> dataset = $widget_data -> id;
             $new_widget -> owner = $request -> user() -> id;
             $new_widget -> title = $widget_title;
-            
+
             if ($new_widget -> save()) {
                 // Go the the widget page
                 return redirect() -> route("widget", [
@@ -77,7 +87,7 @@ class WidgetController extends Controller
             } else {
                 return "Failed to save widget";
             }
-            
+
 
             /*
             // Widget queries
@@ -87,7 +97,7 @@ class WidgetController extends Controller
             $fullpath_f = realpath( storage_path() . "/app/uploads/ds/" . $widget_data -> file );
             $fullpath = realpath ( storage_path() .  "/app/uploads/imgs/" );
             $exec_path = realpath( base_path() . '/../../r/generateGraph.R' );
-            
+
             $command = "Rscript {$exec_path} {$fullpath_f} {$fullpath}";
 
             $command_arguments = array();
@@ -124,7 +134,7 @@ class WidgetController extends Controller
             // print $command; exit();
             exec($command, $output);
             */
-            
+
         } else {
             return "Data set not found";
         }

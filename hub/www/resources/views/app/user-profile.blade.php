@@ -3,50 +3,68 @@
 
 @section("head.title", $user -> name)
 
+
+@section("body.subheader")
+
+    <div class="sub-navbar">
+        <div class="container">
+            <div class="row">
+                <div class="twelve columns">
+                    <h4>
+                        <a href='{{ route("profile", ["username" => $user -> name ]) }}'>{{ $user -> name }}</a>
+                    </h4>
+                    <h5>
+                      {{ $user -> email }}
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+
 @section("body.main")
 
     <div class="row">
+        <div class="twelve columns">
 
-        <h3> <?php echo $user -> name; ?> </h3>
+          <h4> Datasets </h4>
 
-        <hr />
+          @if (count($datasets) > 0 )
+              <ul>
+                  @foreach ($datasets as $dataset)
+                      <li>
+                         <h4>
+                              <a href='{{ route("dataset", ["username" => $user -> name, "dataset" => $dataset -> name ]) }}'>
+                                  {{ $dataset -> name }}
+                              </a>
+                          </h4>
+                      </li>
+                  @endforeach
+              </ul>
+          @else
+              <a href="{{ route('create-data') }}" title="Create a new data set"> You haven't uploaded any data set yet </a>
+          @endif
 
-        <h3> Datasets </h3>
+          <hr />
 
-        <ul>
-        
-            <?php foreach ($datasets as $dataset) : ?>
+          <h4> Widgets </h4>
 
-                <li>
-                    <h4>
-                        <a href="<?php echo route("dataset", ["username" => $user -> name, "dataset" => $dataset -> name ]); ?>">
-                            <?php echo $dataset -> name; ?>
-                        </a>
-                    </h4>
-                </li>
-
-            <?php endforeach;  ?>
-        </ul>
-
-        <hr />
-
-        <h3> Widgets </h3>
-
-        <ul>
-        
-            <?php foreach ($widgets as $widget) : ?>
-
-                <li>
-                    <h4>
-                        <a href="<?php echo route("widget", ["username" => $user -> name, "widget" => $widget -> id ]); ?>">
-                            <?php echo $widget -> title; ?>
-                        </a>
-                    </h4>
-                </li>
-
-            <?php endforeach;  ?>
-        </ul>
+          @if (count($widgets) > 0 )
+              <ul>
+                  @foreach ($widgets as $widget)
+                      <li>
+                          <h4>
+                              <a href='{{ route("widget", ["username" => $user -> name, "widget" => $widget -> id ]) }}'>
+                                  {{ $widget -> title }}
+                              </a>
+                          </h4>
+                      </li>
+                  @endforeach
+              </ul>
+          @endif
 
     </div>
-    
+
 @endsection
