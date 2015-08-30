@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Storage;
 use App\Dataset;
 use App\User;
 use App\Http\Requests;
@@ -125,7 +126,51 @@ class DSController extends Controller
                         -> with("dataset", $ds);
             }
         }
-        
+
+        // Throw 404 if it gets to this point.
+        abort(404);
+
+        // Show single data se
+        echo "Fetching Dataset: " . $id . "<br />";
+
+        $dataset = Dataset::find($id);
+        if ($dataset) {
+            echo "<h1>" . (($dataset -> title) ? $dataset -> title : $dataset -> id) . "</h1>";
+            echo "<h3>" . $dataset -> file . "</h3>";
+            echo (($dataset -> description) ? "<p>" . $dataset -> description . '<p>' : "");
+            echo "<a href='edit'> Edit </a><br />";
+            echo "<a href='delete' style='color: red;'> Delete </a>";
+            return;
+        } else {
+            return "404 dataset not found";
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  string $username
+     * @param  string $dataset_name
+     * @return Response
+     */
+    public function showFile(Request $request, $data_set, $file_name) {
+        // Get dataset
+        $dataset = Dataset::where("id", $data_set) -> first();
+        if ($dataset) {
+            // Construct file path
+            $file_path = "uploads/ds/" . $dataset -> file;
+            // Check if file exists
+            if (Storage::exists($file_path)) {
+                // Get content of file and return.
+                $file = Storage::get($file_path);
+
+                return response($file);
+            }
+
+            // throw 404
+            abort(404);
+        }
+
         // Throw 404 if it gets to this point.
         abort(404);
 

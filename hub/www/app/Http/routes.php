@@ -56,6 +56,11 @@ Route::post("data/new", [
 	"uses" => "DSController@store"
 ]);
 
+Route::get("/file/data/{data_set}/{file_name}", [
+		"as" => "data-file",
+		"uses" => "DSController@showFile"
+]);
+
 // Widgets
 Route::get("widget/new", [
 	"as" => "create-widget",
@@ -90,7 +95,7 @@ Route::get("/js/embed.html/{widget_id}", [
     "uses" => "EmbedController@show"
 ]);
 
-// If none of the routes matches then use the first 
+// If none of the routes matches then use the first
 Route::get("/{username}", [
 	"as" => "profile",
 	"uses" =>  "UserController@show"

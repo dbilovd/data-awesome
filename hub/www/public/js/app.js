@@ -10,7 +10,7 @@ define(["jquery", "d3"], function($, d3) {
 	  //           [5, 20], [480, 90], [250, 50], [100, 33], [330, 95], [410, 12], [475, 44], [25, 67], [85, 21],
 	  //           [220, 88],
 	  //       ];
-    
+
 
     var Awesome = {
         // Query for graph
@@ -31,10 +31,23 @@ define(["jquery", "d3"], function($, d3) {
 
         // App entry point
         start : function () {
-            
-            // Sample data file
-            this.dataFile = $("#w_data_file").data("file");
-            
+            try {
+                // check for data-file
+                if ($("#w_data_file").length > 0) {
+                    // Attach data file to object
+                    this.data = {
+                      'file' : $("#w_data_file").val(),
+                      'type' : $("#w_data_file").data("type")
+                    };
+                } else {
+                    // Throw exception
+                    throw "noDataFileFound";
+                }
+            } catch (e) {
+                console.log(e);
+                return;
+            }
+
             // self
             var self = this;
 
@@ -115,8 +128,53 @@ define(["jquery", "d3"], function($, d3) {
             this.run();
         },
 
+        // Initialise data
+        dataInit : function (dataFile, type) {
+            var self = this;
+
+            // Callback function
+            function dataLoaded (error, data) {
+                try {
+                    if (error) {
+                        // Throw exception
+                        throw "dataLoadError";
+                    } else {
+                        // Save data to app object
+                        self.data['data'] = data;
+                        return;
+                    }
+                } catch (e) {
+                    console.log("Error:" + e);
+                    return;
+                }
+            }
+
+            // Use d3's loading data function depending on the type of data file
+            if (type) {
+                switch (type) {
+                  case "csv" :
+                      console.log("Loading CSV data");
+                      break;
+                  case "json" :
+                      d3.json(dataFile, dataLoaded);
+                      break;
+                  default :
+                      // Load JSON data by default
+                      d3.json(dataFile, dataLoaded);
+                      break;
+                }
+            } else {
+                // Load JSON data by default
+                d3.json(dataFile, dataLoaded);
+            }
+
+        },
+
         // Initialise D3 svg canvas
         d3init : function () {
+            // Initialise data
+            this.dataInit(this.data.file, this.data.type);
+
             // Remove any existing svg
             if (this.svg) {
                 this.svg.remove();
@@ -124,26 +182,26 @@ define(["jquery", "d3"], function($, d3) {
 
             // Create new SVG canvas for graph
             this.svg = d3.select("#da-preview-canvas").append("svg")
-                        .attr({
-                            "height" : this.HEIGHT,
-                            "width" : this.WIDTH,
-                        })
-                        .style("border", "1px solid");
+                .attr({
+                    "height" : this.HEIGHT,
+                    "width" : this.WIDTH,
+                })
+                .style("border", "1px solid");
 
             // Set us x & y axis
             this.xScale = d3.scale.linear()
-                            .domain([0, d3.max(dataset, function (d) {
-                                var xs = d[0] ? d[0] : d;
-                                return xs;
-                            })])
-                            .range([0, this.WIDTH - this.PADDING]);
+                .domain([0, d3.max(dataset, function (d) {
+                    var xs = d[0] ? d[0] : d;
+                    return xs;
+                })])
+                .range([0, this.WIDTH - this.PADDING]);
 
             this.yScale = d3.scale.linear()
-                            .domain([0, d3.max(dataset, function (d) {
-                                var ys = d[1] ? d[1] : d;
-                                return ys;
-                            })])
-                            .range([this.HEIGHT - this.PADDING, this.PADDING]);
+                .domain([0, d3.max(dataset, function (d) {
+                    var ys = d[1] ? d[1] : d;
+                    return ys;
+                })])
+                .range([this.HEIGHT - this.PADDING, this.PADDING]);
             this.xAxis = d3.svg.axis().scale(this.xScale).orient("bottom");
             this.yAxis = d3.svg.axis().scale(this.yScale).orient("left");
 
@@ -187,17 +245,17 @@ define(["jquery", "d3"], function($, d3) {
                 "transform" : "translate (" + this.PADDING + ", 0)",
             });
         },
-        
+
         saveSVG : function () {
             console.log("Saving as SVG");
-            
+
             // get svg in DOM
             var svg = $("#da-preview-canvas svg")[0];
             console.log(svg);
             // use XMLSerializer to generate xml
             var xml = (new XMLSerializer).serializeToString(svg);
             console.log(xml);
-            
+
             return xml;
         },
 

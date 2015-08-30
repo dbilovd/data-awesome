@@ -3,6 +3,27 @@
 
 @section("head.title", "Create Widget")
 
+
+@section("body.subheader")
+
+    <div class="sub-navbar">
+        <div class="container">
+            <div class="row">
+                <div class="twelve columns">
+                    <h5>
+                        <a href='{{ route("profile", ["username" => $owner -> name ]) }}'>{{ $owner -> name }}</a>
+                        /
+                        <a href="{{ route("widgets", ["username" => $owner -> name]) }}">Widgets</a>
+                        /
+                        <a href="{{ route("widget", ["username" => $owner -> name, "widget" => $widget -> id ]) }}">{{ $widget -> id }}</a>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
 @section("body.main")
 
         <div class="row">
@@ -71,16 +92,17 @@
                         </div>
                     </div>
 
-                    <input type="hidden" id="w_data_file" value="<?php echo base_path() . "/storage/app/uploads/ds" . $dataset -> file; ?>" />
+                    <!-- data-type: file type. Currently developing with json files. -->
+                    <input type="hidden" id="w_data_file"  data-type="json" value='{{ route("data-file",  [ "data_set" => $dataset -> id, "file_name" => $dataset -> file ] ) }}' />
                     <input type="hidden" id="w_data" name="_data" value="" />
                     <input type="hidden" id="w_data_xml" name="_data_xml" value="" />
                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                </form>    
+                </form>
 
             </div>
 
         </div>
-    
+
 @endsection
 
 @section ("head.scripts")
