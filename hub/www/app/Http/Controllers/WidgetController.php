@@ -89,6 +89,9 @@ class WidgetController extends Controller
             }
 
 
+            /**
+             * Old codes to run R script
+             */
             /*
             // Widget queries
             $widget_query_graph = $request -> input("widget-query-graph");

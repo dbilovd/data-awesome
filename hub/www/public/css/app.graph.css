@@ -2,14 +2,22 @@
  * SVG graph
  *
  */
-.axis path,
-.axis line {
+.x-axis path,
+.y-axis path,
+.x-axis line,
+.y-axis line {
     fill: none;
     stroke: black;
     shape-rendering: crispEdges;
 }
 
-.axis text {
+.x-axis text,
+.y-axis text {
     font-family: sans-serif;
     font-size: 11px;
+}
+
+.x-axis .grid-line,
+.y-axis .grid-line {
+	stroke-opacity: .1;
 }

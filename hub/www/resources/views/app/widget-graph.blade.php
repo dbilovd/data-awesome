@@ -93,7 +93,7 @@
                     </div>
 
                     <!-- data-type: file type. Currently developing with json files. -->
-                    <input type="hidden" id="w_data_file"  data-type="json" value='{{ route("data-file",  [ "data_set" => $dataset -> id, "file_name" => $dataset -> file ] ) }}' />
+                    <input type="hidden" id="w_data_file"  data-type="{{ $dataset -> ext }}" value='{{ route("data-file",  [ "data_set" => $dataset -> id, "file_name" => $dataset -> file ] ) }}' />
                     <input type="hidden" id="w_data" name="_data" value="" />
                     <input type="hidden" id="w_data_xml" name="_data_xml" value="" />
                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />

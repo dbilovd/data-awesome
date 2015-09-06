@@ -31,6 +31,7 @@ define(["jquery", "d3"], function($, d3) {
 
         // App entry point
         start : function () {
+            var self = this;
             try {
                 // check for data-file
                 if ($("#w_data_file").length > 0) {
@@ -48,19 +49,27 @@ define(["jquery", "d3"], function($, d3) {
                 return;
             }
 
+            // Initialise data
+            this.dataInit(this.data.file, this.data.type, function (data) {
+                // Initialise d3 and run after data has been initialised
+                self.d3init();
+                self.run();
+            });
+
             // self
             var self = this;
 
             // Set defaults height and width to parent's container
             this.WIDTH = $("#da-preview-canvas").width();
-//            this.HEIGHT = (this.WIDTH / 10);
             this.HEIGHT = 300;
-            this.PADDING = 30;
+            this.PADDING = {
+              LEFT : 30,
+              TOP : 20,
+              RIGHT : 20,
+              BOTTOM : 20
+            };
 
-            // Initialise D3 svg canvas
-            this.d3init();
-
-//            updated3
+            // Update callback for svg images
             function updateGraph (e) {
                 var value = e.target.value;
                 if (isNaN(value)) {
@@ -77,7 +86,7 @@ define(["jquery", "d3"], function($, d3) {
                         self.HEIGHT = value;
                         break;
                     case "padding" :
-                        self.PADDING = value;
+                        // self.PADDING = value;
                         break;
                 }
 
@@ -89,13 +98,9 @@ define(["jquery", "d3"], function($, d3) {
 
             // Update graph
             $("#widget-form").submit(function (e) {
-                // for test
-//                 e.preventDefault();
-
-                console.log(e);
+                // Set query string to form to be saved on server
                 $("#w_data_xml").val(self.saveSVG());
                 $('#w_data').val(JSON.stringify(self.QUERY));
-                // stringify
             });
 
             // Settings Events
@@ -124,12 +129,10 @@ define(["jquery", "d3"], function($, d3) {
                 self.run();
             });
 
-            // Run graph on page load
-            this.run();
         },
 
         // Initialise data
-        dataInit : function (dataFile, type) {
+        dataInit : function (dataFile, type, callback) {
             var self = this;
 
             // Callback function
@@ -141,27 +144,33 @@ define(["jquery", "d3"], function($, d3) {
                     } else {
                         // Save data to app object
                         self.data['data'] = data;
-                        return;
                     }
                 } catch (e) {
-                    console.log("Error:" + e);
+                    console.trace("Error:" + e);
                     return;
                 }
+
+                // Run callback function
+                callback(data);
+                return;
             }
 
             // Use d3's loading data function depending on the type of data file
             if (type) {
                 switch (type) {
-                  case "csv" :
-                      console.log("Loading CSV data");
-                      break;
-                  case "json" :
-                      d3.json(dataFile, dataLoaded);
-                      break;
-                  default :
-                      // Load JSON data by default
-                      d3.json(dataFile, dataLoaded);
-                      break;
+                    case "csv" :
+                        d3.csv(dataFile, dataLoaded);
+                        break;
+                    case "tsv" :
+                        d3.tsv(dataFile, dataLoaded);
+                        break;
+                    case "json" :
+                        d3.json(dataFile, dataLoaded);
+                        break;
+                    default :
+                        // Load JSON data by default
+                        d3.json(dataFile, dataLoaded);
+                        break;
                 }
             } else {
                 // Load JSON data by default
@@ -170,15 +179,36 @@ define(["jquery", "d3"], function($, d3) {
 
         },
 
+        // Key Function
+        dataKey : function (data, index) {
+            return data["Year"];
+        },
+
         // Initialise D3 svg canvas
         d3init : function () {
-            // Initialise data
-            this.dataInit(this.data.file, this.data.type);
-
             // Remove any existing svg
             if (this.svg) {
                 this.svg.remove();
             }
+
+            // Data index this local scope
+            // console.log(this.PADDING);
+            data = this.data.data;
+
+            /*
+            // nesting
+            var nested = d3.nest()
+                .key(function (d) {
+                    return d.Year;
+                })
+                .entries(data);
+            console.log(nested);
+            return;
+            */
+            // console.log(data.length);
+            // edata = d3.layout.stack()(data);
+            // console.log(edata);
+            // data = dataset;
 
             // Create new SVG canvas for graph
             this.svg = d3.select("#da-preview-canvas").append("svg")
@@ -186,29 +216,63 @@ define(["jquery", "d3"], function($, d3) {
                     "height" : this.HEIGHT,
                     "width" : this.WIDTH,
                 })
-                .style("border", "1px solid");
+                // .append("g")
+                // .attr({
+                //   "transform" : "translate(" + 20 + ", " + (this.HEIGHT - this.PADDING.TOP) + ")"
+                // })
+                ;
 
             // Set us x & y axis
+            // x ordinal scale
+            // xScale = d3.scale.ordinal()
+            //   .rangeRoundBands([0, this.WIDTH - this.PADDING.LEFT - this.PADDING.RIGHT]);
+            /*
+            // x Linear
             this.xScale = d3.scale.linear()
-                .domain([0, d3.max(dataset, function (d) {
-                    var xs = d[0] ? d[0] : d;
-                    return xs;
-                })])
+                .domain(d3.extent(data, function (d) {
+                    return d.Year;
+                }))
                 .range([0, this.WIDTH - this.PADDING]);
+            */
+            // x time
+            this.xScale = d3.time.scale()
+                .domain(d3.extent(data, function (d) {
+                    var date = new Date(d.Year, 0, 1); // 01-01-YYYY
+                    return date;
+                }))
+                .range([0, this.WIDTH - (this.PADDING.LEFT + this.PADDING.RIGHT)]);
 
             this.yScale = d3.scale.linear()
-                .domain([0, d3.max(dataset, function (d) {
-                    var ys = d[1] ? d[1] : d;
-                    return ys;
+                .domain([0, d3.max(data, function (d) {
+                    return d.Urban;
                 })])
-                .range([this.HEIGHT - this.PADDING, this.PADDING]);
-            this.xAxis = d3.svg.axis().scale(this.xScale).orient("bottom");
-            this.yAxis = d3.svg.axis().scale(this.yScale).orient("left");
+                .range([this.HEIGHT - this.PADDING.TOP, this.PADDING.BOTTOM]);
+
+            this.rScale = d3.scale.linear()
+                .domain(d3.extent(data, function(d) {
+                    return d.Urban;
+                }))
+                .range([10, 20]);
+
+            // Axis
+            this.xAxis = d3.svg.axis()
+                .scale(this.xScale)
+                .orient("bottom")
+                .ticks(data.length)
+                .tickFormat(function (d, i) {
+                    // return in time format
+                    return d3.time.format("%Y")(d);
+                });
+
+            // yAxis
+            this.yAxis = d3.svg.axis()
+                .scale(this.yScale)
+                .orient("left")
+                .ticks(10);
 
         },
 
         run : function () {
-            console.log(this);
             switch (this.QUERY.type) {
                 case "bar" :
                     this.plotBarGraph();
@@ -228,6 +292,8 @@ define(["jquery", "d3"], function($, d3) {
         // Run function to finalise graph.
         finish : function () {
 
+            var self = this;
+
             // Add labels after graph has been drawn
             if (this.QUERY.labels) {
                 this.plotLabels();
@@ -236,26 +302,54 @@ define(["jquery", "d3"], function($, d3) {
             this.QUERY.labels = true;
 
             // Plot axis
-            this.svg.append("g").call(this.xAxis).attr({
-                "class" : "axis",
-                "transform" : "translate (" + this.PADDING + ", " + (this.HEIGHT - this.PADDING) + ")",
-            });
-            this.svg.append("g").call(this.yAxis).attr({
-                "class" : "axis",
-                "transform" : "translate (" + this.PADDING + ", 0)",
-            });
+            this.svg.append("g")
+                .call(this.xAxis)
+                .attr({
+                    "class" : "x-axis",
+                    "transform" : "translate (" + this.PADDING.LEFT + ", " + (this.HEIGHT - this.PADDING.BOTTOM) + ")",
+                });
+
+            // x grid lines
+            this.svg.selectAll("g.x-axis .tick")
+                .append("line")
+                .classed("grid-line", true)
+                .attr({
+                    "x0" : 0,
+                    "y0" : 0,
+                    "x1" : 0,
+                    "y1" : function (d, i) {
+                        return 0 - (self.HEIGHT - (self.PADDING.TOP + self.PADDING.BOTTOM));
+                    }
+                });
+
+            // y axis
+            this.svg.append("g")
+                .call(this.yAxis)
+                .attr({
+                    "class" : "y-axis",
+                    "transform" : "translate (" + this.PADDING.LEFT + ", 0)",
+                });
+
+            // y horizontal grid lines
+            this.svg.selectAll("g.y-axis .tick")
+                .append("line")
+                .classed("grid-line", true)
+                .attr({
+                    "x0" : 0,
+                    "y0" : 0,
+                    "x1" : function (d, i) {
+                        return self.WIDTH - (self.PADDING.LEFT + self.PADDING.RIGHT);
+                    },
+                    "y1" : 0,
+                });
         },
 
         saveSVG : function () {
-            console.log("Saving as SVG");
-
-            // get svg in DOM
+            // Fetch SVG from DOM
             var svg = $("#da-preview-canvas svg")[0];
-            console.log(svg);
             // use XMLSerializer to generate xml
-            var xml = (new XMLSerializer).serializeToString(svg);
-            console.log(xml);
-
+            var xmlSerialised = new XMLSerializer();
+            var xml = xmlSerialised.serializeToString(svg);
             return xml;
         },
 
@@ -264,23 +358,28 @@ define(["jquery", "d3"], function($, d3) {
             var self = this;
             // Attrs
             var attrs = {
-                "width" : function (data) {
+                "width" : function (d, i) {
                     // Use a dynamic width for each bar by diving the width of the graph by the number of
                     // bars available.
                     // Optionally you can add a space between each bar by subtracting a number - space - from
                     // the calculated width.
-                    var width = (self.WIDTH / dataset.length);
-                    width = width - 10; // Add a space of 10 between each bar
+                    var width = ((self.WIDTH - (self.PADDING.LEFT + self.PADDING.RIGHT)) / self.data.data.length);
+                    width = width - 10;
                     return width;
                 },
-                "fill" : function (data, index) {
-                    return "teal";
+                "fill" : function (d, i) {
+                    /**
+                     * TODO: search why function only returns one color for all bars;
+                     */
+                    var colorScale = d3.scale.category10(),
+                        color = colorScale(i);
+                    return color;
                 },
-                "x" : function (data, index) {
-                    var x = index * ((self.WIDTH - self.PADDING ) / dataset.length) + self.PADDING;
+                "x" : function (d, i) {
+                    var x = (i * (attrs.width(d, i) + 10) + self.PADDING.LEFT);
                     return x;
                 },
-                "y" : function (data, index){
+                "y" : function (d, i){
                     // To Plot each bar starting from the bottom of the graph. We plot the hightest point first as y
                     // then plot the base of the bar as the height from that point.
                     // So y becomes the difference between the height of the graph and the height of the bar - data
@@ -294,20 +393,24 @@ define(["jquery", "d3"], function($, d3) {
                     //return y;
 
                     // Using scales, plot the point here and let attrs.height calculate for height.
-                    return self.yScale(data);
+                    return self.yScale(d.Urban);
 
                 },
-                "height" : function (data, index) {
+                "height" : function (d, i) {
                     // This is the value of each data.
                     // Optionally you can multiply or divide it by a factor to increase the heights of each bar
                     // in the graph. Or use scales to have dynamic scalling.
-                    return self.HEIGHT - (attrs.y(data, index) + self.PADDING);
+                    var height = self.HEIGHT - (attrs.y(d, i) + self.PADDING.BOTTOM);
+                    return height;
                 }
             };
 
             // Plot graph of rects
-            var rects = self.svg.selectAll("rect").data(dataset).enter()
-              .append("rect").attr(attrs);
+            var rects = self.svg.selectAll("rect")
+                .data(self.data.data, self.dataKey)
+                .enter()
+                .append("rect")
+                .attr(attrs);
 
             // Finalise graph
             self.finish();
@@ -318,24 +421,26 @@ define(["jquery", "d3"], function($, d3) {
             var self = this;
 
             var attrs = {
-                "cx" : function (data, index) {
-                    var x = index * ((self.WIDTH - self.PADDING ) / dataset.length) + self.PADDING;
+                "cx" : function (d, i) {
+                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.RIGHT;
                     return x;
                 },
-                "cy" : function (data, index) {
-                    return self.yScale(data);
-                    return self.HEIGHT - (data * 10 - self.PADDING);
+                "cy" : function (d, i) {
+                    return self.yScale(d.Urban);
                 },
                 // Dynamic size of ticks
-                "r" : function (data, index) {
-                    return Math.sqrt(data);
+                "r" : function (d, i) {
+                    var r = self.rScale(d.Urban);
+                    return r;
                 },
             }
 
             // plot graph
-            var circles = self.svg.selectAll("circle").data(dataset).enter()
-                .append("circle").attr(attrs);
-
+            var circles = self.svg.selectAll("circle")
+                .data(self.data.data)
+                .enter()
+                .append("circle")
+                .attr(attrs);
 
             self.finish();
         },
@@ -344,20 +449,19 @@ define(["jquery", "d3"], function($, d3) {
             console.log("Plotting line graph");
             var self = this;
 
-
             var lineCoords = d3.svg.line()
-                .x(function (data, index) {
-                    var x = index * ((self.WIDTH - self.PADDING ) / dataset.length) + self.PADDING;
+                .x(function (d, i) {
+                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.RIGHT;
                     return x;
                 })
-                .y(function (data, index) {
-                    return self.yScale(data);
-                    // return self.HEIGHT - (data * 10 - self.PADDING);
+                .y(function (d, i) {
+                    var y = self.yScale(d.Urban);
+                    return y;
                 })
                 .interpolate("linear");
 
             var attrs = {
-                "d" : lineCoords(dataset),
+                "d" : lineCoords(self.data.data),
                 "stroke" : "red",
                 "stroke-width" : "2px",
                 "fill" : "none"
@@ -373,16 +477,15 @@ define(["jquery", "d3"], function($, d3) {
         },
 
         plotLabels : function () {
-            console.log("Adding text labels");
             var self = this;
 
             var attrs = {
-                "x" : function (data, index) {
-                    var x = index * ((self.WIDTH - self.PADDING ) / dataset.length) + (self.PADDING + 5);
+                "x" : function (d, i) {
+                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / dataset.length) + (self.PADDING.RIGHT + 5);
                     return x;
                 },
-                "y" : function (data, index) {
-                    var y = self.yScale(data) + self.PADDING;
+                "y" : function (d, i) {
+                    var y = self.yScale(d.Urban) + self.PADDING.TOP;
                     return y;
                 },
                 "fill" : "red",
@@ -390,9 +493,9 @@ define(["jquery", "d3"], function($, d3) {
                 "font-size" : "12px",
             };
 
-            self.svg.selectAll("text").data(dataset).enter().append("text")
-                .text(function (data, index) {
-                    return data;
+            self.svg.selectAll("text").data(self.data.data).enter().append("text")
+                .text(function (d, i) {
+                    return d.Urban;
                 })
                 .attr(attrs);
         }
