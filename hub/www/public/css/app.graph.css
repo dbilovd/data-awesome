@@ -21,3 +21,12 @@
 .y-axis .grid-line {
 	stroke-opacity: .1;
 }
+
+.dots {
+	fill: white;
+	stroke: red;
+}
+
+.area {
+	fill : #ff6666;
+}

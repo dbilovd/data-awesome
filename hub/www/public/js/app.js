@@ -29,8 +29,643 @@ define(["jquery", "d3"], function($, d3) {
         */
         PADDING : null,
 
+        // New line chart using functional programming
+        plotLineChart : function () {
+            var _chart = {}; // Functional object
+
+            // default vars
+            var _width = 600, // width
+                _height = 300, // height
+                _margins = { top: 30, right: 30, bottom: 30, left: 30 }, //margins
+                _x, // x scale
+                _y, // y scale
+                _r, // r scale
+                _data = [], // data object
+                _svg, // svg element
+                _bodyG,
+                _line,
+                _colors = d3.scale.category10();
+
+            // Chart height
+            _chart.height = function (height) {
+                // If no height return default/existing.
+                // So calling this function without a parameter is same as reading the value of _height
+                if (!arguments.length) return _height;
+                _height = height; // Set as default for usage elsewhere
+                return _chart; // Return object so chained calls can be done on object
+            }
+            // width
+            _chart.width = function (w) {
+                if (!arguments.length) return _width;
+                _width = w;
+                return _chart;
+            }
+            // margins
+            _chart.margins = function (m) {
+                if (!arguments.length) return _margins;
+                _margins = m;
+                return _chart;
+            }
+            // x scale
+            _chart.x = function (x) {
+                if (!arguments.length) return _x;
+                _x = x;
+                return _chart;
+            }
+            // y scale
+            _chart.y = function (y) {
+                if (!arguments.length) return _y;
+                _y = y;
+                return _chart;
+            }
+            // r scale
+            _chart.r = function (r) {
+                if (!arguments.length) return r;
+                _r = r;
+                return _chart;
+            }
+
+            // Rendering
+
+            // rendering svg
+            _chart.render = function () {
+                // create svg element if none exists. Use the attrs available
+                if (!_svg) {
+                    _svg = d3.select("#da-preview-canvas").append("svg")
+                        .attr({
+                            "height" : _height,
+                            "width" : _width,
+                        });
+
+                    // Render axis
+                    _chart.renderAxes(_svg);
+                    // Define clip path for svg
+                    _chart.defineClipPath(_svg);
+                }
+                // Render chart
+                _chart.renderBody(_svg);
+            }
+
+            // render axis
+            _chart.renderAxes = function (svg) {
+                // Render all axis inside one g element
+                var axesG = svg.append("g").attr("class", "axes");
+                _chart.renderXAxis(axesG);
+                _chart.renderYAxis(axesG);
+            }
+            // render x axis
+            _chart.renderXAxis = function (axesG) {
+                // Add range to scale at this point
+                _x.range([0, _chart.canvasWidth()]);
+                // Axis
+                var xAxis = d3.svg.axis()
+                    .scale(_x) // Use _chart's x scale
+                    .orient("bottom");
+                // Draw
+                axesG.append("g")
+                    .attr({
+                        "class" : "x-axis axis",
+                        "transform" : "translate (" + _chart.xStart() + "," + _chart.yStart() + ")"
+                    })
+                    .call(xAxis);
+                // Grid lines
+                axesG.selectAll("g.x-axis .tick")
+                    .append("line")
+                    .attr({
+                        "class" : "grid-line",
+                        "x0" : 0,
+                        "y0" : 0,
+                        "x1" : 0,
+                        "y1" : - _chart.canvasHeight(),
+                    });
+            }
+            // render y axis
+            _chart.renderYAxis = function (axesG) {
+                // yAxis
+                _y.range([_chart.canvasHeight(), 0]);
+                var yAxis = d3.svg.axis()
+                    .scale(_y)
+                    .orient("left");
+
+                // Draw axis
+                axesG.append("g")
+                    .attr({
+                        "class" : "y-axis axis",
+                        "transform" : "translate (" + _chart.xStart() + "," + _chart.yEnd() + ")"
+                    })
+                    .call(yAxis);
+
+                // Add grid lines
+                axesG.selectAll("g.y-axis .tick")
+                    .append("line")
+                    .attr({
+                        "class" : "grid-line",
+                        "x0" : 0,
+                        "y0" : 0,
+                        "x1" : _chart.canvasWidth(),
+                        "y1" : 0,
+                    });
+            }
+
+            // render clip path for paintable
+            _chart.defineClipPath = function (svg) {
+                var padding = 5;
+                // Using defs element for late rendering and referencing
+                svg.append("defs")
+                    .append("clipPath")
+                    .attr("id", "clippath")
+                    .append("rect")
+                    .attr({
+                        "x" : 0,
+                        "y" : 0,
+                        "width" : _chart.canvasWidth() - 2 * padding,
+                        "height" : _chart.canvasHeight(),
+                    });
+            }
+            // append a g element to the svg and transform, so all charting will show within this 'body'
+            _chart.renderBody = function (svg) {
+                if (!_bodyG) {
+                    _bodyG = svg.append("g")
+                        .attr({
+                            "class" : "chart-body",
+                            "transform" : "translate(" + _chart.xStart() + "," + _chart.yEnd() + ")",
+                            "clip-path" : "clippath", // Reference clip path defined with _chart.defineClipPath
+                        });
+                }
+
+                // Use stack layout to prepare data
+                var stack = d3.layout.stack().offset("wiggle");
+                var stackedData = stack(_data);
+
+                // render line
+                _chart.renderLine(stackedData);
+                // render area
+                _chart.renderArea(stackedData);
+                // render dots
+                _chart.renderDots(stackedData);
+                // render bar
+                // _chart.renderBar();
+            }
+
+            // render bar chart
+            _chart.renderBar = function () {
+                var padding = 2;
+                _data.forEach(function (data, index) {
+                    _bodyG.selectAll("rect.bars")
+                        .data(data)
+                        .enter()
+                        .append("rect")
+                        .attr({
+                            "class" : "bars"
+                        });
+
+                    _bodyG.selectAll("rect.bars")
+                        .data(data)
+                        .transition()
+                        .attr({
+                            "x" : function (d, i) {
+                                return _x(d.x);
+                            },
+                            "y" : function (d, i) {
+                                return _y(d.y);
+                            },
+                            "width" : function (d, i) {
+                                return Math.floor(_chart.canvasWidth() / data.length) - padding;
+                            },
+                            "height" : function (d, i) {
+                                return _chart.canvasHeight() - _y(d.y);
+                            }
+                        });
+                });
+            }
+
+            // render line chart
+            _chart.renderLine = function (stackedData) {
+                console.log(stackedData);
+                // NB: Axis should have ran already, so _x and _y have a range, since those are not suplied at start
+                // Draw a line with each x, y point calculate using _x and _y scales
+                _line = d3.svg.line()
+                    .x(function (d, i) {
+                        return _x(d.x);
+                    })
+                    .y(function (d, i) {
+                        return _y(d.y + d.y0); // For stacked chart
+                    })
+                    .interpolate("linear");
+
+                //
+                _bodyG.selectAll("path.chart-line") // select all paths with the line class we give
+                    // .data(_data) // bind data
+                    .data(stackedData)
+                    .enter().append("path")
+                    .attr({
+                        "fill": "none",
+                        "stroke" : function (d, i) {
+                            return _colors(i);
+                        },
+                        "class" : "chart-line" // class to uniquely identify the lines of this graph from other path elements in svg
+                    });
+
+                // Transition line into place
+                _bodyG.selectAll("path.chart-line")
+                    // .data(_data)
+                    .data(stackedData)
+                    .transition()
+                    .attr({
+                        "d" : function (d, i) { // Draw line
+                            return _line(d); // d here isn't a single data but a line of datas
+                        }
+                    });
+            },
+
+            // render dots
+            _chart.renderDots = function (stackedData) {
+                // r range
+                if (_r) {
+                    _r.range([0, 50]);
+                }
+
+                // Loop through data in the form of an array of arrays of each line objects' points
+                _data.forEach(function (data, index) {
+                    _bodyG.selectAll("circle.dots.dots_" + index)
+                        .data(data)
+                        .enter()
+                        .append("circle")
+                        .attr({
+                            "class" : "dots dots_" + index,
+                        })
+                        .style({
+                            "stroke" : function (d, i) {
+                                return _colors(index);
+                            }
+                        });
+
+                    _bodyG.selectAll("circle.dots.dots_" + index)
+                        .data(data)
+                        .transition()
+                        .attr({
+                            "cx" : function (d, i) {
+                                return _x(d.x);
+                            },
+                            "cy" : function (d, i) {
+                                return _y(d.y + d.y0);
+                            },
+                            "r" : function (d, i) {
+                                return (_r) ? _r(d.y) : 5;
+                            }
+                        });
+                });
+            }
+
+            // render area
+            _chart.renderArea = function (stackedData) {
+                // area fomular
+                var area = d3.svg.area()
+                    .x(function (d, i) {
+                        return _x(d.x);
+                    })
+                    .y0(_chart.canvasHeight())
+                    .y1(function (d, i) {
+                        return _y(d.y + d.y0);
+                    });
+
+                // draw
+                _bodyG.selectAll("path.area")
+                    .data(stackedData)
+                    .enter().append("path")
+                    .attr({
+                        "class" : "area"
+                    })
+                    .style({
+                        "fill" : function (d, i) {
+                            return _colors(i);
+                        },
+                        "opacity" :  "0.3"
+                    });
+
+                // Transition into place
+                _bodyG.selectAll("path.area")
+                    .data(_data)
+                    .transition()
+                    .attr({
+                        "d" : function (d, i) {
+                            return area(d); // d here isn't a single data but a line of datas
+                        }
+                    });
+            }
+
+            // paintable width
+            _chart.canvasWidth = function () {
+                return _width - _margins.left - _margins.right;
+            }
+            // canvas height
+            _chart.canvasHeight = function () {
+                return _height - _margins.top - _margins.bottom;
+            }
+            // x start position
+            _chart.xStart = function () {
+                return _margins.left;
+            }
+            // x end position
+            _chart.xEnd = function () {
+                return _width - _margins.right;
+            }
+            // y start position. For this we are negating the y value so y starts counting from _margin.bottom
+            _chart.yStart = function () {
+                return _height - _margins.bottom;
+            }
+            // y end position
+            _chart.yEnd = function () {
+                return _margins.top;
+            }
+
+            // Manually setting Data for this example
+            _chart.addSeries = function (series) {
+                _data.push(series);
+                return _chart;
+            }
+
+            // Return object instance
+            return _chart;
+        },
+
+        // New line chart using functional programming
+        plotPieChart : function () {
+            var _chart = {}; // Functional object
+
+            // default vars
+            var _width = 600, // width
+                _height = 600, // height
+                _margins = { top: 30, right: 30, bottom: 30, left: 30 }, //margins
+                _data = [], // data object
+                _svg, // svg element
+                _bodyG,
+                _pieG,
+                _radius = 200,
+                _innerRadius = 100,
+                _colors = d3.scale.category20b();
+
+            // Chart height
+            _chart.height = function (height) {
+                // If no height return default/existing.
+                // So calling this function without a parameter is same as reading the value of _height
+                if (!arguments.length) return _height;
+                _height = height; // Set as default for usage elsewhere
+                return _chart; // Return object so chained calls can be done on object
+            }
+            // width
+            _chart.width = function (w) {
+                if (!arguments.length) return _width;
+                _width = w;
+                return _chart;
+            }
+            // margins
+            _chart.margins = function (m) {
+                if (!arguments.length) return _margins;
+                _margins = m;
+                return _chart;
+            }
+            // radius
+            _chart.radius = function (r) {
+                if (!arguments.length) return _radius;
+                _radius = r;
+                return _chart;
+            }
+            // inner Radius
+            _chart.innerRadius = function (r) {
+                if (!arguments.length) return _innerRadius;
+                _innerRadius = r;
+                return _chart;
+            }
+
+            // Rendering
+
+            // rendering svg
+            _chart.render = function () {
+                // create svg element if none exists. Use the attrs available
+                if (!_svg) {
+                    _svg = d3.select("#da-preview-canvas").append("svg")
+                        .attr({
+                            "height" : _height,
+                            "width" : _width,
+                        });
+                }
+                // Render chart
+                _chart.renderBody(_svg);
+            }
+            // render clip path for paintable
+            _chart.defineClipPath = function (svg) {
+                var padding = 5;
+                // Using defs element for late rendering and referencing
+                svg.append("defs")
+                    .append("clipPath")
+                    .attr("id", "clippath")
+                    .append("rect")
+                    .attr({
+                        "x" : 0,
+                        "y" : 0,
+                        "width" : _chart.canvasWidth() - 2 * padding,
+                        "height" : _chart.canvasHeight(),
+                    });
+            }
+
+            // append a g element to the svg and transform, so all charting will show within this 'body'
+            _chart.renderBody = function (svg) {
+                if (!_bodyG) {
+                    _bodyG = svg.append("g")
+                        .attr({
+                            "class" : "chart-body",
+                        });
+                }
+                // render pie
+                _chart.renderPie();
+            }
+
+            // render pie chart
+            _chart.renderPie = function () {
+                // Pie layout to use in formating our data to be used in drawing an arc
+                var pie = d3.layout.pie()
+                    // sort by position on array. Without this, will sort by size (value)
+                    .sort(function (d, i) {
+                        return i;
+                    })
+                    .value(function (d, i) {
+                        return d;
+                    });
+
+                // Arc to be drawn
+                var arc = d3.svg.arc()
+                    .outerRadius(_radius)
+                    .innerRadius(_innerRadius);
+
+                // Render pie chart container g
+                if (!_pieG) {
+                    _pieG = _bodyG.append("g")
+                        .attr({
+                            "class" : "pie",
+                            "transform" : "translate(" + _radius + "," + _radius + ")"
+                        });
+
+                }
+
+                // Render slices
+                _chart.renderPieSlices(pie, arc);
+                // Render labels
+                _chart.renderPieLabels(pie, arc);
+            }
+
+            _chart.renderPieSlices = function (pie, arc) {
+                var pieData = pie(_data);
+                // Bind data
+                var slices = _pieG.selectAll("path.arc")
+                    .data(pieData)
+                    .enter()
+                    .append("path")
+                    .attr({
+                        "class" : "arc",
+                        "fill" : function (d, i) {
+                            return _colors(i);
+                        }
+                    });
+
+                // For fine transition effect using tweening
+                slices.transition()
+                    .duration(2000)
+                    .attrTween("d", function (d) {
+                        var currentArc = this.__current__;
+
+                        // Starting arc
+                        if (!currentArc) {
+                            currentArc = {
+                                startAngle : 0,
+                                endAngle : 0
+                            };
+                        }
+
+                        var interpolate = d3.interpolate(currentArc, d);
+                        this.__current__ = interpolate(1);
+
+                        return function (t) {
+                            return arc(interpolate(t));
+                        }
+                    });
+
+            }
+
+            _chart.renderPieLabels = function (pie, arc) {
+                // Bind data
+                var labels = _pieG.selectAll("text.label")
+                    .data(pie(_data))
+                    .enter()
+                    .append("text")
+                    .attr({
+                        "class" : "label",
+                        "dy" : "0.35em",
+                        "text-anchor" : "middle"
+                    });
+
+                labels.data(pie(_data))
+                    .transition()
+                    .duration(2000)
+                    .text(function (d) {
+                        return d.value;
+                    })
+                    .attr({
+                        "transform" : function (d) {
+                            return "translate(" + arc.centroid(d) + ")";
+                        },
+                    });
+            }
+
+            // paintable width
+            _chart.canvasWidth = function () {
+                return _width - _margins.left - _margins.right;
+            }
+            // canvas height
+            _chart.canvasHeight = function () {
+                return _height - _margins.top - _margins.bottom;
+            }
+            // x start position
+            _chart.xStart = function () {
+                return _margins.left;
+            }
+            // x end position
+            _chart.xEnd = function () {
+                return _width - _margins.right;
+            }
+            // y start position. For this we are negating the y value so y starts counting from _margin.bottom
+            _chart.yStart = function () {
+                return _height - _margins.bottom;
+            }
+            // y end position
+            _chart.yEnd = function () {
+                return _margins.top;
+            }
+
+            // Manually setting Data for this example
+            _chart.addSeries = function (series) {
+                // _data.push(series);
+                _data = series;
+                return _chart;
+            }
+
+            // Return object instance
+            return _chart;
+        },
+
         // App entry point
         start : function () {
+
+          console.log("Starting here");
+          require(["app-d3"], function (chart) {
+              var chart = chart()
+                // .margin("top", 20)
+                // .margin({ top : 40, bottom : 40 })
+                .margin(12324)
+                .height(400).width(800);
+
+            console.log(chart.margin());
+            console.log(chart.width());
+          });
+          return;
+
+            var lineChart = this.plotLineChart();
+
+            var dt = [],
+                dt2 = [];
+            dataset.forEach(function (data, i) {
+                dt.push({
+                    x: i,
+                    y: data
+                });
+                dt2.push({
+                    x: i,
+                    y: data
+                });
+            });
+
+            lineChart.addSeries(dt);
+            lineChart.addSeries(dt2);
+
+            lineChart.x(d3.scale.linear()
+                   .domain([0, (dt.length - 1)])
+                )
+                .y(d3.scale.linear()
+                   // .domain([0, 1]) // for offset expand
+                    .domain([0, (2 * d3.max(dt, function (d) {
+                        return d.y;
+                    }))])
+                )
+                // .r(d3.scale.linear().domain(d3.extent(dt, function (d) {
+                //    return d.y;
+                // })))
+                .render();
+
+            // Pie chart
+            // var pieChart = this.plotPieChart().addSeries(dataset).render();
+
+            return;
+
             var self = this;
             try {
                 // check for data-file
@@ -117,7 +752,9 @@ define(["jquery", "d3"], function($, d3) {
             // Defaults
             this.QUERY = {
                 "type" : "bar",
-                "labels" : true,
+                "showLabels" : true,
+                "showDots" : false,
+                "area" : false
             };
 
             // Query Events
@@ -283,6 +920,13 @@ define(["jquery", "d3"], function($, d3) {
                 case "line" :
                     this.plotLineGraph();
                     break;
+                case "line-area" :
+                    this.QUERY.area = true;
+                    this.plotLineGraph();
+                    break;
+                case "arc" :
+                    this.plotArc();
+                    break;
                 default :
                     this.plotBarGraph();
                     break;
@@ -295,11 +939,16 @@ define(["jquery", "d3"], function($, d3) {
             var self = this;
 
             // Add labels after graph has been drawn
-            if (this.QUERY.labels) {
+            if (this.QUERY.showLabels) {
                 this.plotLabels();
             }
-            // Restore defaults
-            this.QUERY.labels = true;
+            this.QUERY.showLabels = true; // Restore default
+
+            // Render dots
+            if (this.QUERY.showDots) {
+                this.plotDots();
+            }
+            this.QUERY.showDots = false; // Restore default
 
             // Plot axis
             this.svg.append("g")
@@ -351,6 +1000,11 @@ define(["jquery", "d3"], function($, d3) {
             var xmlSerialised = new XMLSerializer();
             var xml = xmlSerialised.serializeToString(svg);
             return xml;
+        },
+
+        plotArc : function () {
+            console.log("Plotting arc");
+            var self = this;
         },
 
         plotBarGraph : function () {
@@ -422,7 +1076,7 @@ define(["jquery", "d3"], function($, d3) {
 
             var attrs = {
                 "cx" : function (d, i) {
-                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.RIGHT;
+                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.LEFT;
                     return x;
                 },
                 "cy" : function (d, i) {
@@ -451,7 +1105,7 @@ define(["jquery", "d3"], function($, d3) {
 
             var lineCoords = d3.svg.line()
                 .x(function (d, i) {
-                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.RIGHT;
+                    var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.LEFT;
                     return x;
                 })
                 .y(function (d, i) {
@@ -467,11 +1121,43 @@ define(["jquery", "d3"], function($, d3) {
                 "fill" : "none"
             };
 
-            // Disable labels for line graph
-            self.QUERY.labels = false;
+            // Hide labels for line graph
+            self.QUERY.showLabels = false;
+            // Show dots on line graph
+            self.QUERY.showDots = true;
 
             // var linePath = self;
             var line = self.svg.append("path").attr(attrs);
+
+            // Render area
+            if (this.QUERY.area) {
+                console.log("Adding area");
+                var area = d3.svg.area()
+                    .x(function (d, i) {
+                        var x = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.LEFT;
+                        return x;
+                    })
+                    .y0(function (d, i) {
+                        return self.yScale(0);
+                    })
+                    .y1(function (d, i) {
+                        return self.yScale(d.Urban);
+                    })
+                    .interpolate("linear");
+
+                self.svg.selectAll("path.area")
+                    .data([self.data.data]) // @TODO: find out why without extra [] the area functions wont run
+                    .enter()
+                    .append("path")
+                    .classed("area", true)
+                    .attr({
+                        "d" : function (d, i) {
+                            console.log(area(d));
+                            return area(d);
+                        }
+                    });
+            }
+            this.QUERY.area = false; // Restore default
 
             self.finish();
         },
@@ -498,6 +1184,29 @@ define(["jquery", "d3"], function($, d3) {
                     return d.Urban;
                 })
                 .attr(attrs);
+        },
+
+        plotDots : function () {
+            var self = this;
+            // Render dots
+            this.svg.append("g").selectAll("circle")
+                .data(this.data.data)
+                .enter()
+                .append("circle")
+                .classed("dots", true)
+                .attr({
+                    "cx" : function (d, i) {
+                        var cx = i * ((self.WIDTH - self.PADDING.LEFT ) / self.data.data.length) + self.PADDING.LEFT;
+                        return cx;
+                    },
+                    "cy" : function (d, i) {
+                        var cy = self.yScale(d.Urban);
+                        return cy;
+                    },
+                    "r" : function (d, i) {
+                        return 5;
+                    }
+                });
         }
 
     }

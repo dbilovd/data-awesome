@@ -69,6 +69,8 @@
                                             <option value="bar"> Bar Graph </option>
                                             <option value="scatter"> Scatter points </option>
                                             <option value="line"> Line </option>
+                                            <option value="line-area"> Line (Area) </option>
+                                            <option value="arc"> Arc </option>
                                         </select>
                                     </div>
                                 </div>
