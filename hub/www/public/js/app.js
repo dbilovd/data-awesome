@@ -615,58 +615,49 @@ define(["jquery", "d3"], function($, d3) {
 
         // App entry point
         start : function () {
+            
+            console.log("Starting here");
 
-          console.log("Starting here");
-          require(["app-d3"], function (chart) {
-              var chart = chart()
-                // .margin("top", 20)
-                // .margin({ top : 40, bottom : 40 })
-                .margin(12324)
-                .height(400).width(800);
+                /*
+                var lineChart = this.plotLineChart();
 
-            console.log(chart.margin());
-            console.log(chart.width());
-          });
-          return;
-
-            var lineChart = this.plotLineChart();
-
-            var dt = [],
-                dt2 = [];
-            dataset.forEach(function (data, i) {
-                dt.push({
-                    x: i,
-                    y: data
+                var dt = [],
+                    dt2 = [];
+                dataset.forEach(function (data, i) {
+                    dt.push({
+                        x: i,
+                        y: data
+                    });
+                    dt2.push({
+                        x: i,
+                        y: data
+                    });
                 });
-                dt2.push({
-                    x: i,
-                    y: data
-                });
-            });
 
-            lineChart.addSeries(dt);
-            lineChart.addSeries(dt2);
+                lineChart.addSeries(dt);
+                lineChart.addSeries(dt2);
 
-            lineChart.x(d3.scale.linear()
-                   .domain([0, (dt.length - 1)])
-                )
-                .y(d3.scale.linear()
-                   // .domain([0, 1]) // for offset expand
-                    .domain([0, (2 * d3.max(dt, function (d) {
-                        return d.y;
-                    }))])
-                )
-                // .r(d3.scale.linear().domain(d3.extent(dt, function (d) {
-                //    return d.y;
-                // })))
-                .render();
+                lineChart.x(d3.scale.linear()
+                       .domain([0, (dt.length - 1)])
+                    )
+                    .y(d3.scale.linear()
+                       // .domain([0, 1]) // for offset expand
+                        .domain([0, (2 * d3.max(dt, function (d) {
+                            return d.y;
+                        }))])
+                    )
+                    // .r(d3.scale.linear().domain(d3.extent(dt, function (d) {
+                    //    return d.y;
+                    // })))
+                    .render();
 
-            // Pie chart
-            // var pieChart = this.plotPieChart().addSeries(dataset).render();
+                // Pie chart
+                // var pieChart = this.plotPieChart().addSeries(dataset).render();
 
-            return;
-
-            var self = this;
+                return;
+                */
+            
+            // Get data file and set data object
             try {
                 // check for data-file
                 if ($("#w_data_file").length > 0) {
@@ -684,11 +675,57 @@ define(["jquery", "d3"], function($, d3) {
                 return;
             }
 
+            
+            var self = this;
             // Initialise data
-            this.dataInit(this.data.file, this.data.type, function (data) {
+            self.dataInit(self.data.file, self.data.type, function (data) {
+                /**
+                 * Prepare data
+                 */
+                    var dt = [],
+                        dt2 = [];
+                    dataset.forEach(function (data, i) {
+                        dt.push({
+                            x: i,
+                            y: data
+                        });
+                        dt2.push({
+                            x: i,
+                            y: data
+                        });
+                    });
+                data.forEach(function (d, i) {
+                    d["x"] = d.Year;
+                    d["y"] = d.Urban;
+                });
+
+                require(["app-d3"], function (chart) {
+                    var chart = chart()
+                        // .data(dt) // Attach data
+                        .data(data) // Attach data
+                        .chart("bar")
+                        .margin("top", 20)
+                        .height(200).width(500)
+                        // Testing with time scale for Year field
+                        .x(d3.time.scale()
+                            .domain(d3.extent(data, function (d) {
+                                var date = new Date(d.Year, 0, 1); // 01-01-YYYY
+                                return date;
+                            }))
+                        )
+                        .y(d3.scale.linear()
+                            .domain([0, (d3.max(data, function (d) {
+                                return d.y;
+                            }))])
+                        );
+
+                      d3.select("#da-preview-canvas").call(chart.render);
+                });
+
+                return;
                 // Initialise d3 and run after data has been initialised
-                self.d3init();
-                self.run();
+                // self.d3init();
+                // self.run();
             });
 
             // self
@@ -770,6 +807,7 @@ define(["jquery", "d3"], function($, d3) {
 
         // Initialise data
         dataInit : function (dataFile, type, callback) {
+            console.log("initialising data");
             var self = this;
 
             // Callback function
