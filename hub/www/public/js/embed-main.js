@@ -12,7 +12,7 @@ require.config({
 });
 
 require(["embed-app"], function (AwesomeEmbed) {
-    
+	
     AwesomeEmbed.start();
-    
+
 });
