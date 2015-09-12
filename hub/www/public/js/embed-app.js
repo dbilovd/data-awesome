@@ -29,8 +29,8 @@ define(['jquery'], function ($) {
 
             // Insert iframe
             var iframe = document.createElement("iframe");
-            iframe.style.width = jq(this).data("width") ? jq(this).data("width") : "500px"; // Default width 500px
-            iframe.style.height = jq(this).data("height") ? jq(this).data("height") : "300px"; // Default height 300px
+            iframe.style.width = jq(this).data("width") ? jq(this).data("width") : "800px"; // Default width 500px
+            iframe.style.height = jq(this).data("height") ? jq(this).data("height") : "400px"; // Default height 300px
             iframe.style.border = jq(this).data("border") ? "2px solid" : "none"; // Default DONT show border
             iframe.src = iframeURL; // iFrame's url
 

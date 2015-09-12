@@ -48,6 +48,7 @@
                                 <h5> Configure </h5>
                             </div>
                             <div class="da-widget-graph-form">
+                                <!--
                                 <div class="row">
                                     <div class="one-third column">
                                         <label> Width </label>
@@ -62,6 +63,7 @@
                                         <input type="text" class="u-full-width" id="w-graph-padding" name="w-graph-padding" placeholder="in px" />
                                     </div>
                                 </div>
+                                -->
                                 <div class="row">
                                     <div class="twelve columns">
                                         <label> Type of graph </label>

@@ -28,8 +28,8 @@ define(["d3"], function(d3) {
                 y : "",
                 r : ""
             },
-            // Data
-            data,
+            data, // Data
+            options = {}, // Chart options
             // Default chart to plot: Bar
             chartType = "bar",
             // UI Elements
@@ -106,7 +106,7 @@ define(["d3"], function(d3) {
          * scales
          */
         
-        
+
         /**
          * chart.x
          */
@@ -143,6 +143,16 @@ define(["d3"], function(d3) {
         chart.data = function (d) {
             if (!arguments.length) return data;
             data = d;
+            return chart;
+        }
+        
+        /**
+         *
+         *
+         */
+        chart.options = function (o) {
+            if (!arguments.length) return options;
+            options = o;
             return chart;
         }
         
@@ -360,14 +370,32 @@ define(["d3"], function(d3) {
             
             // Call chart functions based on chartType
             switch (chartType) {
-                // Plot 'line' chart
+                // line
                 case "line" :
-                    console.log("Ploting line chart");
+                    plotLineChart(); // plot line
+                    if (options.showDots) {
+                        plotDots();
+                    }
                     break;
-                // Plot 'bar' chart as default
+                    
+                // line-area
+                case "line-area" :
+                    plotLineChart(); // plot line
+                    plotArea(); // Show area
+                    console.log(options);
+                    if (options.showDots) {
+                        plotDots();
+                    }
+                    break;
+                    
+                // scatter
+                case "scatter" :
+                    plotScatterChart();
+                    break;
+                    
+                // bar (default)
                 case "bar":
                 default :
-                    console.log("Plotting bar chart by default");
                     plotBarChart();
                     break;
             }
@@ -384,6 +412,7 @@ define(["d3"], function(d3) {
         var plotBarChart = function () {
             // Padding between bars
             var barPadding = 2;
+            
             // Plot graph into chart g element
             chartG.selectAll("rect.bars")
                 .data(data)
@@ -395,10 +424,7 @@ define(["d3"], function(d3) {
 
             var attrs = {
                 "x" : function (d, i) {
-                    // console.log(scales.x(d.x));
-                    // return scales.x(d.x);
-                    var x = i * (attrs.width(d, i) + barPadding);
-                    return x
+                    return scales.x(d.x);
                 },
                 "y" : function (d, i) {
                     return scales.y(d.y);
@@ -417,7 +443,181 @@ define(["d3"], function(d3) {
                 .attr(attrs);
         }
         
+        /**
+         * Plot Line Chart
+         *
+         */
+        var plotLineChart = function () {
+            
+            // NB: Axis should have ran already, so _x and _y have a range, since those are not suplied at start
+            // Draw a line with each x, y point calculate using _x and _y scales
+            var line = d3.svg.line()
+                .x(function (d, i) {
+                    return scales.x(d.x);
+                })
+                .y(function (d, i) {
+                    if (!options.stacked)  {
+                        var y = scales.y(d.y);
+                    } else { // For stacked data
+                        var y = scales.y(d.y + d.y0);
+                    }
+                    
+                    return y;
+                })
+                .interpolate("linear");
+
+            //
+            chartG.selectAll("path.chart-line") // select all paths with the line class we give
+                .data([data]) // bind data
+                .enter()
+                .append("path")
+                .attr({
+                    "fill": "none",
+                    "stroke" : function (d, i) {
+                        return "red";
+                        // return _colors(i);
+                    },
+                    "class" : "chart-line" // class to uniquely identify the lines of this graph from other path elements in svg
+                });
+
+            // Transition line into place
+            chartG.selectAll("path.chart-line")
+                .data([data])
+                .transition()
+                .attr({
+                    "d" : function (d, i) { // Draw line
+                        return line(d); // d here isn't a single data but a line of datas
+                    }
+                });
+        }
         
+        /**
+         * Plot Scatter chart
+         *
+         */
+        var plotScatterChat = function () {
+            // Just plot only dots
+            plotDots();
+        }
+        
+        /**
+         * Plot Areas
+         *
+         */
+        var plotArea = function () {
+            
+            var drawArea = function (data) {
+                // Area generation function
+                var area = d3.svg.area()
+                    .x(function (d, i) {
+                        return scales.x(d.x);
+                    })
+                    .y0(canvasHeight())
+                    .y1(function (d, i) {
+                        if (!options.stacked) {
+                            return scales.y(d.y);
+                        } else {
+                            return scales.y(d.y0 + d.y1);
+                        }
+                    });
+                
+                // Draw path with area data
+                chartG.selectAll("path.chart-area")
+                    .data([data])
+                    .enter()
+                    .append("path")
+                    .attr({
+                        "class" : "chart-area",
+                    })
+                    .style({
+                        "fill" : function (d, i) {
+                            return "red";
+                            // return _colors(i);
+                        },
+                        "opacity" :  "0.3"
+                    });
+
+                // Handle transition
+                chartG.selectAll("path.chart-area")
+                    .data([data])
+                    .transition()
+                    .attr({
+                        "d" : function (d, i) {
+                            return area(d);
+                        }
+                    });
+                    
+            }
+            
+            /*  
+            if (data instanceof Array) {
+                data.forEach(function (data, index) {
+                    drawArea(data);
+                });
+            } else {
+            */
+                drawArea(data);
+//            }
+            
+        }
+        
+        /**
+         * Plot Dots
+         *
+         */
+        var plotDots = function () {
+            
+            // r range
+            if (scales.r) {
+                scales.r.range([0, canvasWidth()]);
+            }
+            
+            var dots = function (dt) {
+                    chartG.selectAll("circle.dots.dots")
+                        .data(data)
+                        .enter()
+                        .append("circle")
+                        .attr({
+                            "class" : "dots dots",
+                        })
+                        .style({
+                            "stroke" : function (d, i) {
+                                return "red";
+                                // return _colors(index);
+                            }
+                        });
+
+                    chartG.selectAll("circle.dots.dots")
+                        .data(data)
+                        .transition()
+                        .attr({
+                            "cx" : function (d, i) {
+                                return scales.x(d.x);
+                            },
+                            "cy" : function (d, i) {
+                                if (!options.stacked) {
+                                    return scales.y(d.y);
+                                } else {
+                                    return scales.y(d.y + d.y0);
+                                }
+                            },
+                            "r" : function (d, i) {
+                                return (scales.r) ? scales.r(d.y) : 5;
+                            }
+                        });
+            }
+
+            if (data instanceof Array) {
+                // Loop through data in the form of an array of arrays of each line objects' points
+                data.forEach(function (data, index) {
+                    dots(data);
+                });
+            } else {
+                dots(data);
+            }
+        }
+        
+        // Return chart object
         return chart;
     }
 

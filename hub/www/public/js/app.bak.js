@@ -2,7 +2,7 @@
  *
  */
 
-define(["jquery", "d3", "app-d3"], function($, d3, appChart) {
+define(["jquery", "d3"], function($, d3) {
 
     // Sample data
     var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13, 11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
@@ -13,7 +13,6 @@ define(["jquery", "d3", "app-d3"], function($, d3, appChart) {
 
 
     var Awesome = {
-        
         // Query for graph
         QUERY : {
             type : "bar", // default graph type bar
@@ -29,6 +28,366 @@ define(["jquery", "d3", "app-d3"], function($, d3, appChart) {
         }
         */
         PADDING : null,
+
+        // New line chart using functional programming
+        plotLineChart : function () {
+            var _chart = {}; // Functional object
+
+            // default vars
+            var _width = 600, // width
+                _height = 300, // height
+                _margins = { top: 30, right: 30, bottom: 30, left: 30 }, //margins
+                _x, // x scale
+                _y, // y scale
+                _r, // r scale
+                _data = [], // data object
+                _svg, // svg element
+                _bodyG,
+                _line,
+                _colors = d3.scale.category10();
+
+            // Chart height
+            _chart.height = function (height) {
+                // If no height return default/existing.
+                // So calling this function without a parameter is same as reading the value of _height
+                if (!arguments.length) return _height;
+                _height = height; // Set as default for usage elsewhere
+                return _chart; // Return object so chained calls can be done on object
+            }
+            // width
+            _chart.width = function (w) {
+                if (!arguments.length) return _width;
+                _width = w;
+                return _chart;
+            }
+            // margins
+            _chart.margins = function (m) {
+                if (!arguments.length) return _margins;
+                _margins = m;
+                return _chart;
+            }
+            // x scale
+            _chart.x = function (x) {
+                if (!arguments.length) return _x;
+                _x = x;
+                return _chart;
+            }
+            // y scale
+            _chart.y = function (y) {
+                if (!arguments.length) return _y;
+                _y = y;
+                return _chart;
+            }
+            // r scale
+            _chart.r = function (r) {
+                if (!arguments.length) return r;
+                _r = r;
+                return _chart;
+            }
+
+            // Rendering
+
+            // rendering svg
+            _chart.render = function () {
+                // create svg element if none exists. Use the attrs available
+                if (!_svg) {
+                    _svg = d3.select("#da-preview-canvas").append("svg")
+                        .attr({
+                            "height" : _height,
+                            "width" : _width,
+                        });
+
+                    // Render axis
+                    _chart.renderAxes(_svg);
+                    // Define clip path for svg
+                    _chart.defineClipPath(_svg);
+                }
+                // Render chart
+                _chart.renderBody(_svg);
+            }
+
+            // render axis
+            _chart.renderAxes = function (svg) {
+                // Render all axis inside one g element
+                var axesG = svg.append("g").attr("class", "axes");
+                _chart.renderXAxis(axesG);
+                _chart.renderYAxis(axesG);
+            }
+            // render x axis
+            _chart.renderXAxis = function (axesG) {
+                // Add range to scale at this point
+                _x.range([0, _chart.canvasWidth()]);
+                // Axis
+                var xAxis = d3.svg.axis()
+                    .scale(_x) // Use _chart's x scale
+                    .orient("bottom");
+                // Draw
+                axesG.append("g")
+                    .attr({
+                        "class" : "x-axis axis",
+                        "transform" : "translate (" + _chart.xStart() + "," + _chart.yStart() + ")"
+                    })
+                    .call(xAxis);
+                // Grid lines
+                axesG.selectAll("g.x-axis .tick")
+                    .append("line")
+                    .attr({
+                        "class" : "grid-line",
+                        "x0" : 0,
+                        "y0" : 0,
+                        "x1" : 0,
+                        "y1" : - _chart.canvasHeight(),
+                    });
+            }
+            // render y axis
+            _chart.renderYAxis = function (axesG) {
+                // yAxis
+                _y.range([_chart.canvasHeight(), 0]);
+                var yAxis = d3.svg.axis()
+                    .scale(_y)
+                    .orient("left");
+
+                // Draw axis
+                axesG.append("g")
+                    .attr({
+                        "class" : "y-axis axis",
+                        "transform" : "translate (" + _chart.xStart() + "," + _chart.yEnd() + ")"
+                    })
+                    .call(yAxis);
+
+                // Add grid lines
+                axesG.selectAll("g.y-axis .tick")
+                    .append("line")
+                    .attr({
+                        "class" : "grid-line",
+                        "x0" : 0,
+                        "y0" : 0,
+                        "x1" : _chart.canvasWidth(),
+                        "y1" : 0,
+                    });
+            }
+
+            // render clip path for paintable
+            _chart.defineClipPath = function (svg) {
+                var padding = 5;
+                // Using defs element for late rendering and referencing
+                svg.append("defs")
+                    .append("clipPath")
+                    .attr("id", "clippath")
+                    .append("rect")
+                    .attr({
+                        "x" : 0,
+                        "y" : 0,
+                        "width" : _chart.canvasWidth() - 2 * padding,
+                        "height" : _chart.canvasHeight(),
+                    });
+            }
+            // append a g element to the svg and transform, so all charting will show within this 'body'
+            _chart.renderBody = function (svg) {
+                if (!_bodyG) {
+                    _bodyG = svg.append("g")
+                        .attr({
+                            "class" : "chart-body",
+                            "transform" : "translate(" + _chart.xStart() + "," + _chart.yEnd() + ")",
+                            "clip-path" : "clippath", // Reference clip path defined with _chart.defineClipPath
+                        });
+                }
+
+                // Use stack layout to prepare data
+                var stack = d3.layout.stack().offset("wiggle");
+                var stackedData = stack(_data);
+
+                // render line
+                _chart.renderLine(stackedData);
+                // render area
+                _chart.renderArea(stackedData);
+                // render dots
+                _chart.renderDots(stackedData);
+                // render bar
+                // _chart.renderBar();
+            }
+
+            // render bar chart
+            _chart.renderBar = function () {
+                var padding = 2;
+                _data.forEach(function (data, index) {
+                    _bodyG.selectAll("rect.bars")
+                        .data(data)
+                        .enter()
+                        .append("rect")
+                        .attr({
+                            "class" : "bars"
+                        });
+
+                    _bodyG.selectAll("rect.bars")
+                        .data(data)
+                        .transition()
+                        .attr({
+                            "x" : function (d, i) {
+                                return _x(d.x);
+                            },
+                            "y" : function (d, i) {
+                                return _y(d.y);
+                            },
+                            "width" : function (d, i) {
+                                return Math.floor(_chart.canvasWidth() / data.length) - padding;
+                            },
+                            "height" : function (d, i) {
+                                return _chart.canvasHeight() - _y(d.y);
+                            }
+                        });
+                });
+            }
+
+            // render line chart
+            _chart.renderLine = function (stackedData) {
+                console.log(stackedData);
+                // NB: Axis should have ran already, so _x and _y have a range, since those are not suplied at start
+                // Draw a line with each x, y point calculate using _x and _y scales
+                _line = d3.svg.line()
+                    .x(function (d, i) {
+                        return _x(d.x);
+                    })
+                    .y(function (d, i) {
+                        return _y(d.y + d.y0); // For stacked chart
+                    })
+                    .interpolate("linear");
+
+                //
+                _bodyG.selectAll("path.chart-line") // select all paths with the line class we give
+                    // .data(_data) // bind data
+                    .data(stackedData)
+                    .enter().append("path")
+                    .attr({
+                        "fill": "none",
+                        "stroke" : function (d, i) {
+                            return _colors(i);
+                        },
+                        "class" : "chart-line" // class to uniquely identify the lines of this graph from other path elements in svg
+                    });
+
+                // Transition line into place
+                _bodyG.selectAll("path.chart-line")
+                    // .data(_data)
+                    .data(stackedData)
+                    .transition()
+                    .attr({
+                        "d" : function (d, i) { // Draw line
+                            return _line(d); // d here isn't a single data but a line of datas
+                        }
+                    });
+            },
+
+            // render dots
+            _chart.renderDots = function (stackedData) {
+                // r range
+                if (_r) {
+                    _r.range([0, 50]);
+                }
+
+                // Loop through data in the form of an array of arrays of each line objects' points
+                _data.forEach(function (data, index) {
+                    _bodyG.selectAll("circle.dots.dots_" + index)
+                        .data(data)
+                        .enter()
+                        .append("circle")
+                        .attr({
+                            "class" : "dots dots_" + index,
+                        })
+                        .style({
+                            "stroke" : function (d, i) {
+                                return _colors(index);
+                            }
+                        });
+
+                    _bodyG.selectAll("circle.dots.dots_" + index)
+                        .data(data)
+                        .transition()
+                        .attr({
+                            "cx" : function (d, i) {
+                                return _x(d.x);
+                            },
+                            "cy" : function (d, i) {
+                                return _y(d.y + d.y0);
+                            },
+                            "r" : function (d, i) {
+                                return (_r) ? _r(d.y) : 5;
+                            }
+                        });
+                });
+            }
+
+            // render area
+            _chart.renderArea = function (stackedData) {
+                // area fomular
+                var area = d3.svg.area()
+                    .x(function (d, i) {
+                        return _x(d.x);
+                    })
+                    .y0(_chart.canvasHeight())
+                    .y1(function (d, i) {
+                        return _y(d.y + d.y0);
+                    });
+
+                // draw
+                _bodyG.selectAll("path.area")
+                    .data(stackedData)
+                    .enter().append("path")
+                    .attr({
+                        "class" : "area"
+                    })
+                    .style({
+                        "fill" : function (d, i) {
+                            return _colors(i);
+                        },
+                        "opacity" :  "0.3"
+                    });
+
+                // Transition into place
+                _bodyG.selectAll("path.area")
+                    .data(_data)
+                    .transition()
+                    .attr({
+                        "d" : function (d, i) {
+                            return area(d); // d here isn't a single data but a line of datas
+                        }
+                    });
+            }
+
+            // paintable width
+            _chart.canvasWidth = function () {
+                return _width - _margins.left - _margins.right;
+            }
+            // canvas height
+            _chart.canvasHeight = function () {
+                return _height - _margins.top - _margins.bottom;
+            }
+            // x start position
+            _chart.xStart = function () {
+                return _margins.left;
+            }
+            // x end position
+            _chart.xEnd = function () {
+                return _width - _margins.right;
+            }
+            // y start position. For this we are negating the y value so y starts counting from _margin.bottom
+            _chart.yStart = function () {
+                return _height - _margins.bottom;
+            }
+            // y end position
+            _chart.yEnd = function () {
+                return _margins.top;
+            }
+
+            // Manually setting Data for this example
+            _chart.addSeries = function (series) {
+                _data.push(series);
+                return _chart;
+            }
+
+            // Return object instance
+            return _chart;
+        },
 
         // New line chart using functional programming
         plotPieChart : function () {
@@ -253,19 +612,13 @@ define(["jquery", "d3", "app-d3"], function($, d3, appChart) {
             // Return object instance
             return _chart;
         },
-        
-        // SVG DOM container selection
-        canvas : null,
-        
+
         // App entry point
         start : function () {
             
             console.log("Starting here");
-            
-            // Select dom container
-            this.canvas = d3.select("#da-preview-canvas");
 
-            /*
+                /*
                 var lineChart = this.plotLineChart();
 
                 var dt = [],
@@ -321,32 +674,117 @@ define(["jquery", "d3", "app-d3"], function($, d3, appChart) {
                 console.log(e);
                 return;
             }
+
             
-            // references to 'this' for callback functions
             var self = this;
-            
             // Initialise data
             self.dataInit(self.data.file, self.data.type, function (data) {
                 /**
                  * Prepare data
-                 * @TODO this should be done authomatically
                  */
+                    var dt = [],
+                        dt2 = [];
+                    dataset.forEach(function (data, i) {
+                        dt.push({
+                            x: i,
+                            y: data
+                        });
+                        dt2.push({
+                            x: i,
+                            y: data
+                        });
+                    });
                 data.forEach(function (d, i) {
-                    d["x"] = new Date(d.Year, 0, 1);
+                    d["x"] = d.Year;
                     d["y"] = d.Urban;
                 });
-                
-                self.chart({
-                    "data" : data
+
+                require(["app-d3"], function (chart) {
+                    var chart = chart()
+                        // .data(dt) // Attach data
+                        .data(data) // Attach data
+                        .chart("bar")
+                        .margin("top", 20)
+                        .height(200).width(500)
+                        // Testing with time scale for Year field
+                        .x(d3.time.scale()
+                            .domain(d3.extent(data, function (d) {
+                                var date = new Date(d.Year, 0, 1); // 01-01-YYYY
+                                return date;
+                            }))
+                        )
+                        .y(d3.scale.linear()
+                            .domain([0, (d3.max(data, function (d) {
+                                return d.y;
+                            }))])
+                        );
+
+                      d3.select("#da-preview-canvas").call(chart.render);
                 });
+
+                return;
+                // Initialise d3 and run after data has been initialised
+                // self.d3init();
+                // self.run();
             });
-            
-            // Update widget form before submitting
+
+            // self
+            var self = this;
+
+            // Set defaults height and width to parent's container
+            this.WIDTH = $("#da-preview-canvas").width();
+            this.HEIGHT = 300;
+            this.PADDING = {
+              LEFT : 30,
+              TOP : 20,
+              RIGHT : 20,
+              BOTTOM : 20
+            };
+
+            // Update callback for svg images
+            function updateGraph (e) {
+                var value = e.target.value;
+                if (isNaN(value)) {
+                    e.target.value = "";
+                    return;
+                }
+
+                // Update vars
+                switch (e.data.field) {
+                    case "width" :
+                        self.WIDTH = value;
+                        break;
+                    case "height" :
+                        self.HEIGHT = value;
+                        break;
+                    case "padding" :
+                        // self.PADDING = value;
+                        break;
+                }
+
+                // Rebuild graph
+                self.d3init();
+                // Run graph
+                self.run();
+            };
+
+            // Update graph
             $("#widget-form").submit(function (e) {
                 // Set query string to form to be saved on server
                 $("#w_data_xml").val(self.saveSVG());
                 $('#w_data').val(JSON.stringify(self.QUERY));
             });
+
+            // Settings Events
+            $("#w-graph-width").on("change", {
+                field : "width"
+            }, updateGraph);
+            $("#w-graph-height").on("change", {
+                field : "height"
+            }, updateGraph);
+            $("#w-graph-padding").on("change", {
+                field : "padding"
+            }, updateGraph);
 
             // Defaults
             this.QUERY = {
@@ -360,104 +798,16 @@ define(["jquery", "d3", "app-d3"], function($, d3, appChart) {
             $("#w-graph-type").on("change", {}, function (e) {
                 var value = e.target.value;
                 // Update query and run graph
-                // self.QUERY.type = value;
-                // Run graph
-                self.chart({
-                    "data" : self.data.data,
-                    "type" : value
-                });
-                // self.d3init();
-                // self.run();
+                self.QUERY.type = value;
+                self.d3init();
+                self.run();
             });
 
-        },
-        
-        // Chart 
-        chart : function (options) {
-            /**
-            var chart = chart()
-                .data(data) // Attach data
-                .chart("bar") // Type of graph
-                .margin("top", 40) // Margin top
-                .height(400)
-                .width(800)
-                // Testing with time scale for Year field
-                .x(d3.time.scale()
-                    .domain(d3.extent(data, function (d) {
-                        var date = new Date(d.Year, 0, 1); // 01-01-YYYY
-                            return date;
-                        }))
-                )
-                .y(d3.scale.linear()
-                    .domain([0, (d3.max(data, function (d) {
-                        return d.y;
-                    }))])
-                );
-
-            d3.select("#da-preview-canvas").call(chart.render);
-            */
-            /*
-            // Add labels after graph has been drawn
-            if (this.QUERY.showLabels) {
-                this.plotLabels();
-            }
-            this.QUERY.showLabels = true; // Restore default
-
-            // Render dots
-            if (this.QUERY.showDots) {
-                this.plotDots();
-            }
-            this.QUERY.showDots = false; // Restore default
-            */
-            
-            // if options is undefined
-            options = (!options) ? {} : options;
-            // Initialise and render chart
-            var chart = appChart();
-            
-            // Attach data
-            if (options.data) {
-                var data = options.data;
-                
-                // Attach data
-                chart.data(data);
-                // Configure scales
-                // Testing with time scale for Year field
-                chart.x(d3.time.scale()
-                    .domain(d3.extent(data, function (d) {
-                        var date = new Date(d.Year, 0, 1); // 01-01-YYYY
-                        return date;
-                    }))
-                )
-                chart.y(d3.scale.linear()
-                    .domain([0, (d3.max(data, function (d) {
-                        return d.y;
-                    }))])
-                );
-            }
-            
-            // Type of graph
-            if (options.type) {
-                if (options.type == "line" || options.type == "line-area") {
-                    // show dots
-                    this.QUERY.showDots = true;
-                }
-                
-                chart.chart(options.type);
-            } else if (this.QUERY) {
-                chart.chart(this.QUERY.type);
-            }
-            
-            // Set rendering options
-            chart.options(this.QUERY);
-            // remove existing svg 
-            this.canvas.selectAll("svg").remove();
-            // Call chart.render on svg canvas selection
-            this.canvas.call(chart.render);
         },
 
         // Initialise data
         dataInit : function (dataFile, type, callback) {
+            console.log("initialising data");
             var self = this;
 
             // Callback function

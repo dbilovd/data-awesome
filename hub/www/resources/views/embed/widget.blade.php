@@ -60,13 +60,16 @@
 			bottom: 0;
 		}
 		</style>
+        <link href="<?php echo asset("css/app.graph.css"); ?>" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
 		<div class="header">
 			<h4> <?php echo $widget -> title; ?> </h4>
 		</div>
-		<div class="content">
-			<img src="<?php echo route("get-embed-widget-image", [ "widget_id" => $widget -> id ]); ?>" width="100%" >
+		<div class="content" style="text-align: center;">
+            <object data="<?php echo route("get-embed-widget-image", [ "widget_id" => $widget -> id ]); ?>" type="image/svg+xml">
+                <img src="<?php echo route("get-embed-widget-image", [ "widget_id" => $widget -> id ]); ?>" height="95%" >
+            </object>
 		</div>
 		<div class="footer">
 			<a href="<?php echo route("widget", [ 'widget' => $widget -> id, 'username' => $owner -> name	]); ?>" 

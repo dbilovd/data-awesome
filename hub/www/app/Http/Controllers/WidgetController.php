@@ -189,6 +189,8 @@ class WidgetController extends Controller
                 -> first();
 
             if ($widget) {
+                return $widget;
+                
                 return view("app.widget-details")
                     -> with("owner", $owner)
                     -> with("widget", $widget);
@@ -239,21 +241,40 @@ class WidgetController extends Controller
                     -> first();
 
         if ($widget) {
-
+            
             $widget -> query = $request -> input("_data");
-            /**
-             * Save svg image
-             */
-            // construct storage path
-            $file_name = $widget -> owner . "_" . $widget -> id . "_" . time();
-            // Create new directory to hold this file
-            Storage::makeDirectory("graphs/" . $file_name);
-            // Final file path
-            $file_name = "graphs/" . $file_name . "/" . $file_name . ".svg";
-            // Save file
-            if (Storage::put($file_name, $request -> input("_data_xml"))) {
-                // Update widget with file path
-                $widget -> image = $file_name;
+            
+            if ($widget -> image) {
+                // Use the path of an existing image to get directory and old file name
+                $path_explode = explode("/", $widget -> image);
+                $file_directory = $path_explode[ count($path_explode) - 2 ];
+                $filename = $path_explode[ count($path_explode) - 1 ];
+                
+                // Create a new file name
+                $new_filename = $widget -> owner . "_" . $widget -> id . "_" . time();
+                // Final file path
+                $file_path_final = "graphs/" . $file_directory . "/" . $new_filename . ".svg";
+                // Save file
+                if (Storage::put($file_path_final, $request -> input("_data_xml"))) {
+                    // Update widget with file path
+                    $widget -> image = $file_path_final;
+                }
+            } else {
+                // Save in new path
+                /**
+                 * Save svg image
+                 */
+                // construct storage path
+                $file_name = $widget -> owner . "_" . $widget -> id . "_" . time();
+                // Create new directory to hold this file
+                Storage::makeDirectory("graphs/" . $file_name);
+                // Final file path
+                $file_name = "graphs/" . $file_name . "/" . $file_name . ".svg";
+                // Save file
+                if (Storage::put($file_name, $request -> input("_data_xml"))) {
+                    // Update widget with file path
+                    $widget -> image = $file_name;
+                }
             }
 
             if ($widget -> save()) {
