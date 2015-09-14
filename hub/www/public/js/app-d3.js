@@ -225,7 +225,6 @@ define(["d3"], function(d3) {
          * NB: This should be called last because it doesn't return an instance of the chart object
          */
         chart.render = function (selection) {
-            console.log("Rendering chart ...");
             
             // Create SVG element
             if (!svg) {
@@ -382,7 +381,7 @@ define(["d3"], function(d3) {
                 case "line-area" :
                     plotLineChart(); // plot line
                     plotArea(); // Show area
-                    console.log(options);
+                    
                     if (options.showDots) {
                         plotDots();
                     }

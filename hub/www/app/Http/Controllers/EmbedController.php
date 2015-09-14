@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 // Models
 use App\Widget;
 use App\User;
+use App\Dataset;
 
 class EmbedController extends Controller
 {
@@ -30,10 +31,18 @@ class EmbedController extends Controller
             $to_return = view("embed/widget") -> with("widget", $widget);
             // Get owner
             if ($widget -> owner) {
-                $widget_owner = User::where("id", $widget -> owner) -> first();;
+                $widget_owner = User::where("id", $widget -> owner) -> first();
 
                 if ($widget_owner) {
                     $to_return -> with("owner", $widget_owner);
+                }
+            }
+            
+            // Get data set
+            if ($widget -> dataset) {
+                $widget_dataset = Dataset::where("id", $widget -> dataset) -> first();
+                if ($widget_dataset) {
+                    $to_return -> with("dataset", $widget_dataset);
                 }
             }
 
@@ -43,8 +52,7 @@ class EmbedController extends Controller
             return $to_return;
         }
         
-        // abort(404, "Widget not found");
-        return "Widget not found error";
+        return view("embed/no_widget") -> with("widget_id", $id);
     }
 
     /**

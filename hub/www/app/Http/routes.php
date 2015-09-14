@@ -39,9 +39,12 @@ Route::get("/home", function() {
 	return Auth::user();
 });
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', [
+    "as" => "home",
+    "uses" => function () {
+        return view('index');
+    }
+]);
 
 // Data Sets
 Route::get("data", "DSController@index");

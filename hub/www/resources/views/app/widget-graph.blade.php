@@ -26,6 +26,9 @@
 
 @section("body.main")
 
+    <?php
+    $query_php = json_decode($widget -> query, TRUE);
+    ?>
         <div class="row">
             <div id="widget-container" class="twelve columns">
 
@@ -48,31 +51,25 @@
                                 <h5> Configure </h5>
                             </div>
                             <div class="da-widget-graph-form">
-                                <!--
-                                <div class="row">
-                                    <div class="one-third column">
-                                        <label> Width </label>
-                                        <input type="text" class="u-full-width" id="w-graph-width" name="w-graph-width" placeholder="in px" />
-                                    </div>
-                                    <div class="one-third column">
-                                        <label> Height </label>
-                                        <input type="text" class="u-full-width" id="w-graph-height" name="w-graph-height" placeholder="in px" />
-                                    </div>
-                                    <div class="one-third column">
-                                        <label> Padding </label>
-                                        <input type="text" class="u-full-width" id="w-graph-padding" name="w-graph-padding" placeholder="in px" />
-                                    </div>
-                                </div>
-                                -->
                                 <div class="row">
                                     <div class="twelve columns">
                                         <label> Type of graph </label>
+                                        <?php
+                                        $chart_types = array("bar" => "Bar Chart",
+                                            "scatter" => "Scatter Diagram",
+                                            "line" => "Line",
+                                            "line-area" => "Line (Area)",
+                                            "arc" => "Arc"
+                                        );
+                                        ?>
                                         <select name="w-graph-type" class="u-full-width" id="w-graph-type">
-                                            <option value="bar"> Bar Graph </option>
-                                            <option value="scatter"> Scatter points </option>
-                                            <option value="line"> Line </option>
-                                            <option value="line-area"> Line (Area) </option>
-                                            <option value="arc"> Arc </option>
+                                            @foreach ($chart_types as $key => $chart_type)
+                                                <option value="{{ $key }}"
+                                                    @if ($key == $query_php["type"])
+                                                        selected="selected"
+                                                    @endif
+                                                > {{ $chart_type }} </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -98,6 +95,7 @@
 
                     <!-- data-type: file type. Currently developing with json files. -->
                     <input type="hidden" id="w_data_file"  data-type="{{ $dataset -> ext }}" value='{{ route("data-file",  [ "data_set" => $dataset -> id, "file_name" => $dataset -> file ] ) }}' />
+                    <input type="hidden" id="w_data_query" value="{{ $widget -> query }}" />
                     <input type="hidden" id="w_data" name="_data" value="" />
                     <input type="hidden" id="w_data_xml" name="_data_xml" value="" />
                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />

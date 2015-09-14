@@ -189,8 +189,6 @@ class WidgetController extends Controller
                 -> first();
 
             if ($widget) {
-                return $widget;
-                
                 return view("app.widget-details")
                     -> with("owner", $owner)
                     -> with("widget", $widget);

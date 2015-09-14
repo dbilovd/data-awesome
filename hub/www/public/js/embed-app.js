@@ -13,11 +13,10 @@ define(['jquery'], function ($) {
         // Get all element with class 'data-awesome-widget'
         // loop through and add an iframe to each of them
         jq("div.data-awesome-widget").each(function () {
-            console.log(this);
             // Get data attributes
             var widgetData = jq(this).data();
-            console.log(widgetData);
-
+            
+            // iFrame URL
             var iframeURL = "http://da-hub.local.dev/js/embed.html";
             // Add widget id to query url
             if (jq(this).data("widgetId")) {

@@ -4,7 +4,7 @@
         <title> @yield('head.title') : Data-Awesome </title>
 
         <!-- Stylesheets -->
-        <link href="<?php echo asset("css//skeleton.css"); ?>" rel="stylesheet" type="text/css" />
+        <link href="<?php echo asset("css/skeleton.css"); ?>" rel="stylesheet" type="text/css" />
         <link href="<?php echo asset("css/normalize.css"); ?>" rel="stylesheet" type="text/css" />
         <!-- fonts and icons-->
         <link href='https://fonts.googleapis.com/css?family=Fira+Sans' rel='stylesheet' type='text/css'>
