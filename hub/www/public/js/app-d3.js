@@ -435,37 +435,52 @@ define(["d3"], function(d3) {
          * plot bar chart
          */
         var plotBarChart = function () {
+            
             // Padding between bars
             var barPadding = 2;
             
-            // Plot graph into chart g element
-            chartG.selectAll("rect.bars")
-                .data(data)
-                .enter()
-                .append("rect")
-                .attr({
-                    "class" : "bars"
-                });
+            var bars = function (dt, index) {
+                // Plot graph into chart g element
+                chartG.selectAll("rect.bars.bars_" + index)
+                    .data(dt)
+                    .enter()
+                    .append("rect")
+                    .attr({
+                        "class" : "bars bars_" + index,
+                        "fill" : function (d, i) {
+                            return colors(index);
+                        }
+                    });
 
-            var attrs = {
-                "x" : function (d, i) {
-                    return scales.x(d.x);
-                },
-                "y" : function (d, i) {
-                    return scales.y(d.y);
-                },
-                "width" : function (d, i) {
-                    return Math.floor(canvasWidth() / data.length) - barPadding;
-                },
-                "height" : function (d, i) {
-                    return canvasHeight() - scales.y(d.y);
-                }
-            };
+                var attrs = {
+                    "x" : function (d, i) {
+                        var x = scales.x(d.x);
+                        x = x + (attrs.width(d, i) * index);
+                        return x;
+                    },
+                    "y" : function (d, i) {
+                        return scales.y(d.y);
+                    },
+                    "width" : function (d, i) {
+                        var width = Math.floor(canvasWidth() / dt.length) - barPadding;
+                        console.log(canvasWidth(), dt.length, width);
+                        width = width / data.length;
+                        return width;
+                    },
+                    "height" : function (d, i) {
+                        return canvasHeight() - scales.y(d.y);
+                    }
+                };
+
+                chartG.selectAll("rect.bars.bars_" + index)
+                    .data(dt)
+                    .transition()
+                    .attr(attrs);
+            }
             
-            chartG.selectAll("rect.bars")
-                .data(data)
-                .transition()
-                .attr(attrs);
+            data.forEach(function (d, i) {
+                bars(d, i);
+            });
         }
         
         /**
@@ -588,45 +603,51 @@ define(["d3"], function(d3) {
                 scales.r.range([5, 15]);
             }
             
-            var dots = function (dt) {
-                    chartG.selectAll("circle.dots.dots")
-                        .data(data)
-                        .enter()
-                        .append("circle")
-                        .attr({
-                            "class" : "dots dots",
-                        })
-                        .style({
-                            "stroke" : function (d, i) {
-                                return colors(i);
-                            },
-                            // Fill if r scale is available
-                            "fill" : function (d, i) {
-                                return (scales.r) ? colors(i) : "";
-                            }
-                        });
+            var dots = function (dt, index) {
+                
+                chartG.selectAll("circle.dots.dots_" + index)
+                    .data(dt)
+                    .enter()
+                    .append("circle")
+                    .attr({
+                        "class" : "dots dots_" + index,
+                    })
+                    .style({
+                        "stroke" : function (d, i) {
+                            return colors(index);
+                        },
+                        // Fill if r scale is available
+                        "fill" : function (d, i) {
+                            return (scales.r) ? colors(index) : "";
+                        }
+                    });
 
-                    chartG.selectAll("circle.dots.dots")
-                        .data(data)
-                        .transition()
-                        .attr({
-                            "cx" : function (d, i) {
-                                return scales.x(d.x);
-                            },
-                            "cy" : function (d, i) {
-                                if (!options.stacked) {
-                                    return scales.y(d.y);
-                                } else {
-                                    return scales.y(d.y + d.y0);
-                                }
-                            },
-                            "r" : function (d, i) {
-                                return (scales.r) ? scales.r(d.y) : 5;
+                chartG.selectAll("circle.dots.dots_" + index)
+                    .data(dt)
+                    .transition()
+                    .attr({
+                        "cx" : function (d, i) {
+                            return scales.x(d.x);
+                        },
+                        "cy" : function (d, i) {
+                            if (!options.stacked) {
+                                return scales.y(d.y);
+                            } else {
+                                return scales.y(d.y + d.y0);
                             }
-                        });
+                        },
+                        "r" : function (d, i) {
+                            return 5;
+                            // return (scales.r) ? scales.r(d.y) : 5;
+                        }
+                    });
             }
-
-            dots(data);
+            
+            // Plot each data as a line
+            data.forEach(function (d, i) {
+                dots(d, i);
+            });
+        
         }
         
         // Return chart object

@@ -133,7 +133,6 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                 /**
                  * new data pre-processor
                  */
-                console.log(parseDateY("2001"));
                 console.log(data);
                 var dataKeys = d3.keys(data[0]); // from first object in array
                 console.log(dataKeys);
@@ -183,6 +182,7 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                     xMin,
                     yMax = 0,
                     yMin = 0;
+                
                 for (var i = 0; i < dataKeys.length; i++) {
                     if (i > 0) {
                         var datum = dataColumn(dataMap, i);
@@ -312,7 +312,7 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
             if (options.type) {
                 // show dots on line, line-area and scatter charts
                 if (options.type == "line" || options.type == "line-area") {
-                    // this.QUERY.showDots = true;
+                     this.QUERY.showDots = true;
                 }
                 
                 chart.chart(options.type);
