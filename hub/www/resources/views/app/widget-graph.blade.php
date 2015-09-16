@@ -73,6 +73,24 @@
                                         </select>
                                     </div>
                                 </div>
+                                <!-- Show dots -->
+                                <div class="row" id="wc-graph-dots">
+                                    <div class="twelve columns">
+                                        <label  class="u-full-width">
+                                            <input type="checkbox" id="w-graph-dots" /> Show dots
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- Show labels -->
+                                <div class="row" id="wc-graph-labels">
+                                    <div class="twelve columns">
+                                        <label  class="u-full-width">
+                                            <input type="checkbox" id="w-graph-labels" /> Show labels
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Misc -->
                                 <div class="row">
                                     <div class="twelve columns" id="additional-fields">
                                     </div>
