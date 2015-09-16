@@ -26,10 +26,10 @@ require(["jquery", "d3", "app"], function ($, d3, Awesome) {
         if (query instanceof Object) {
             var awesome = Awesome;
             
-            Awesome.start();
+            Awesome.width = ejq("body").width() - 20; // Set svg chart width
             Awesome.canvas = d3.selectAll("#canvas");
+            Awesome.start();
             Awesome.QUERY = query;
-            // Awesome.chart();
         }
     }
     

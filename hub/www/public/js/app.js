@@ -10,7 +10,12 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
     //      [5, 20], [480, 90], [250, 50], [100, 33], [330, 95], [410, 12], [475, 44], [25, 67], [85, 21],
     //      [220, 88],
     // ];
+    
+    // jQuery no conflict
+    ajq = $.noConflict();
 
+    var parseDateY = d3.time.format("%Y").parse;
+    
     var Awesome = {
         
         // Query for graph
@@ -20,17 +25,24 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
         // SVG DOM container selection
         canvas : null,
         
+        // Scales
+        xScale : null,
+        yScale : null,
+        
         // App entry point
         start : function () {
             // Select dom container
-            this.canvas = d3.select("#da-preview-canvas");
+            if (!this.canvas) {
+                this.canvas = d3.select("#da-preview-canvas");
+            }
             
             // Set defaulfs
             this.QUERY = {
                 "type" : "bar",
                 "showLabels" : true,
                 "showDots" : false,
-                "area" : false
+                "area" : false,
+                "r" : false
             };
             
             // Initialise defaults from graph
@@ -50,10 +62,60 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
             
             // Initialise data
             self.dataInit(function (data) {
+                //var baseKey;
                 /**
                  * Prepare data
                  * @TODO this should be done authomatically
                  */
+                // console.log(data);
+                /**
+                 * Assumtion 1: First row of data contains labels for each field
+                 */
+                /*
+                // Get field keys
+                var dataKeys = d3.keys(data[0]);
+                console.log(dataKeys);
+                // Add field keys to UI for selecting
+                var fieldChoiceDiv = document.createElement('div');
+                var fieldChoiceLabel = document.createElement('label');
+                fieldChoiceLabel.innerText = "Base Field (x axis)";
+                var additionalFieldsDiv = document.getElementById('additional-fields');
+                additionalFieldsDiv.appendChild(fieldChoiceLabel);
+                additionalFieldsDiv.appendChild(fieldChoiceDiv);
+                var fieldChoiceSelect = document.createElement('select');
+                fieldChoiceSelect.id = "fieldChoiceSelect";
+                fieldChoiceDiv.appendChild(fieldChoiceSelect);
+                for (var i = 0; i < dataKeys.length; i++) {
+                    var option = document.createElement('option');
+                    option.value = i;
+                    option.text = dataKeys[i];
+                    fieldChoiceSelect.appendChild(option);
+                }
+                
+                
+                // Register callback events
+                $('#fieldChoiceSelect').on("change", function (e) {
+                    baseKey = dataKeys[e.target.value];
+                    console.log(nest(data)); 
+                });
+                
+                // default base key = first var
+                baseKey = dataKeys[0];
+                
+                var keyFunction = function (d, i) {
+                    return d[baseKey];
+                }
+                
+                
+                var nest = function (data) {
+                    return d3.nest()
+                        .key(keyFunction)
+                        .entries(data);
+                }
+                
+                var nestedData = nest(data);
+                console.log(nestedData);
+                
                 data.forEach(function (d, i) {
                     // console.log(d3.keys(d));
                     d["x"] = new Date(d.Year, 0, 1);
@@ -64,6 +126,98 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                 self.chart({
                     "data" : data
                 });
+                
+                */
+                
+                
+                /**
+                 * new data pre-processor
+                 */
+                console.log(parseDateY("2001"));
+                console.log(data);
+                var dataKeys = d3.keys(data[0]); // from first object in array
+                console.log(dataKeys);
+                
+                // new data map
+                var dataMap = data.map(function (d) {
+                    var toReturn = {}; // Object to replace existing d in data
+                    // map each dataKey key as property of d
+                    for (var i = 0; i < dataKeys.length; i++) {
+                        var mapItem = d[dataKeys[i]];
+//                        console.log(mapItem);
+                        // Prepare values
+                        if (i == 0) {
+                            // Assume first field is a date field
+                            // @TODO replace this assumption with field definition of some sorts
+                            mapItem = parseDateY(mapItem.toString()); // convert date to string if it's an int
+                        } else {
+                            // Convert all others as Numbers
+                            mapItem = +mapItem;
+                        }
+                        
+                        toReturn[i] = mapItem;
+                    }
+                    
+                    return toReturn;
+                });
+                
+                // function to select one column of data as y
+                var dataColumn = function (data, column) {
+                    return data.map(function (d) {
+                       if (column == 0) {
+                           // return a single value
+                           return d[0];
+                       } else {
+                           // Return object
+                           column = (column) ? column : 1;
+                           return {
+                               x : d[0], // Set first field
+                               y : d[column]
+                           }
+                       }
+                    });
+                }
+                
+                var dataToPlot = [];
+                var xMax = 0,
+                    xMin,
+                    yMax = 0,
+                    yMin = 0;
+                for (var i = 0; i < dataKeys.length; i++) {
+                    if (i > 0) {
+                        var datum = dataColumn(dataMap, i);
+                        dataToPlot.push(datum);
+                        // calculate max and min for x and y
+                        // xMax
+                        xMax = Math.max(xMax, d3.max(datum, function (d) {
+                            return d.x;
+                        }));
+                        // xMin
+                        xMinD = d3.min(datum, function (d) {
+                            return d.x;
+                        });
+                        xMin = (xMin) ? Math.min(xMin, xMinD) : xMinD;
+                        // yMax
+                        yMax = Math.max(yMax, d3.max(datum, function (d) {
+                            return d.y;
+                        }));
+                    }
+                }
+                
+                self.data.data = data = dataToPlot;
+                console.log(self.data);
+                
+                xScale = d3.time.scale().domain([xMin, xMax]);
+                yScale = d3.scale.linear().domain([yMin, yMax]);
+                
+                // Build graph
+                self.QUERY.showDots = false;
+                self.chart({
+                    "data" : data,
+                    "x" : xScale,
+                    "y" : yScale,
+                });
+                
             });
             
             /**
@@ -81,12 +235,15 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
             // on Bar type change
             $("#w-graph-type").on("change", {}, function (e) {
                 var value = e.target.value;
+                console.log(self.data);
                 // Update query
                 self.QUERY.type = value;
                 // Build graph
                 self.chart({
                     "data" : self.data.data,
-                    "type" : value
+                    "type" : value,
+                    "x" : xScale,
+                    "y" : yScale,
                 });
             });
 
@@ -100,6 +257,14 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
             // Initialise and render chart
             var chart = AwesomeChart();
             
+            if (this.width) {
+                chart.width(this.width);
+            }
+            
+            if (this.height) {
+                chart.height(this.height);
+            }
+            
             // Attach data
             if (options.data) {
                 // Attach data from options
@@ -109,24 +274,45 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                 // Configure scales
                 // Testing with time scale for Year field
                 // @TODO this should be done authomatically
-                chart.x(d3.time.scale()
-                    .domain(d3.extent(data, function (d) {
-                        var date = new Date(d.Year, 0, 1); // 01-01-YYYY
-                        return date;
-                    }))
-                )
-                chart.y(d3.scale.linear()
-                    .domain([0, (d3.max(data, function (d) {
-                        return d.y;
-                    }))])
-                );
+                if (options.x) {
+                    chart.x(options.x);
+                } else {
+                    chart.x(d3.time.scale()
+                        .domain(d3.extent(data, function (d) {
+                            var date = new Date(d.Year, 0, 1); // 01-01-YYYY
+                            return date;
+                        }))
+                    )
+                }
+                if (options.y) {
+                    chart.y(options.y);
+                } else {
+                    chart.y(d3.scale.linear()
+                        .domain([0, (d3.max(data, function (d) {
+                            return d.y;
+                        }))])
+                    );
+                }
+                
+                if (options.type == "scatter") {
+                    this.QUERY.r = true;
+                }
+            
+                // Setup r scale for 'scatter' diagram
+                if (options.r || this.QUERY.r) {
+                    chart.r(d3.scale.linear()
+                        .domain(d3.extent(data, function (d, i) {
+                            return d.y;
+                        })));
+                }
+                
             }
             
             // Set type of chart
             if (options.type) {
                 // show dots on line, line-area and scatter charts
                 if (options.type == "line" || options.type == "line-area") {
-                    this.QUERY.showDots = true;
+                    // this.QUERY.showDots = true;
                 }
                 
                 chart.chart(options.type);
@@ -210,11 +396,6 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                 return;
             }
 
-        },
-
-        // Key Function
-        dataKey : function (data, index) {
-            return data["Year"];
         },
 
         svgToXML : function () {

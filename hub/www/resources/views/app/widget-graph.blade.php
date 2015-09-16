@@ -73,6 +73,10 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="twelve columns" id="additional-fields">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

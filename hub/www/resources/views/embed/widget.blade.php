@@ -20,6 +20,7 @@
             }
             
             .footer {
+                background-color: #f7f7f7;
                 border-top: 1px solid #e7e7e7;
                 height: 20px;
             }
@@ -42,7 +43,7 @@
 	<body>
 		<div class="header">
 			<h4> <?php echo $widget -> title; ?> </h4>
-            <hr />
+            <hr color="#efefef" />
 		</div>
 		<div class="content">
             <div id="canvas"></div>
@@ -61,6 +62,7 @@
         <input type="hidden" id="w_data_query" data-query="{{ $widget -> query }}" />
         <input type="hidden" id="w_data_file"  data-type="{{ $dataset -> ext }}" 
                value='{{ route("data-file",  [ "data_set" => $dataset -> id, "file_name" => $dataset -> file ] ) }}' />
+        <script type="text/javascript" src="{{ asset('js/lib/iframeResizer.contentWindow.js') }}"></script>
         <script type="text/javascript" src="{{ asset('js/lib/require.js') }}"
                 data-main="{{ asset('js/embed-chart') }}"></script>
 	</body>

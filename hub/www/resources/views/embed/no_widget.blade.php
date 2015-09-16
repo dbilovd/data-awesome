@@ -20,6 +20,7 @@
             }
             
             .footer {
+                background-color: #f7f7f7;
                 border-top: 1px solid #e7e7e7;
                 height: 20px;
             }

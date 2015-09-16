@@ -22,6 +22,7 @@ define(["d3"], function(d3) {
                 bottom: 30,
                 left: 30
             },
+            colors = d3.scale.category20(),
             // scales
             scales = {
                 x : "",
@@ -99,6 +100,16 @@ define(["d3"], function(d3) {
             }
             // Set a single margin
             margins[margin] = value;
+            return chart;
+        }
+        
+        /**
+         *
+         *
+         */
+        chart.colors = function (c) {
+            if (!arguments.length) return colors;
+            colors = c;
             return chart;
         }
         
@@ -269,11 +280,18 @@ define(["d3"], function(d3) {
             // Add range to scale at this point
             scales.x.range([0, canvasWidth()]);
             
+            // Number of ticks
+            var ticks = function () {
+                var ticks = Math.max(canvasWidth() / (data.length * 4), 2);
+                return ticks;
+            };
+            
             // Axis
             var xAxis = d3.svg.axis()
                 .scale(scales.x) // Use x scale
                 .orient("bottom")
-                .ticks(data.length)
+                .ticks(5)
+                // .ticks(ticks()) // @TODO after working graph come back and fix this to dynamic value
                 .tickFormat(function (d, i) {
                     // return in time format
                     return d3.time.format("%Y")(d);
@@ -307,9 +325,17 @@ define(["d3"], function(d3) {
             // yAxis
             scales.y.range([canvasHeight(), 0]);
             
+            // Number of ticks
+            var ticks = function () {
+                var ticks = Math.max(canvasHeight() / (data.length * 4), 2);
+                return ticks;
+            };
+            
             var yAxis = d3.svg.axis()
                 .scale(scales.y)
-                .orient("left");
+                .orient("left")
+                .ticks(5);
+                // .ticks(ticks()); // @TODO: same as on xAxis
 
             // Draw axis
             svgElement.append("g")
@@ -448,8 +474,8 @@ define(["d3"], function(d3) {
          */
         var plotLineChart = function () {
             
-            // NB: Axis should have ran already, so _x and _y have a range, since those are not suplied at start
-            // Draw a line with each x, y point calculate using _x and _y scales
+            // NB: Axis should have ran already, so x and y have a range, since those are not suplied at start
+            // Draw a line with each x, y point calculate using x and y scales
             var line = d3.svg.line()
                 .x(function (d, i) {
                     return scales.x(d.x);
@@ -467,21 +493,22 @@ define(["d3"], function(d3) {
 
             //
             chartG.selectAll("path.chart-line") // select all paths with the line class we give
-                .data([data]) // bind data
+                //.data([data]) // bind data
+                .data(data)
                 .enter()
                 .append("path")
                 .attr({
                     "fill": "none",
                     "stroke" : function (d, i) {
-                        return "red";
-                        // return _colors(i);
+                        return colors(i);
                     },
                     "class" : "chart-line" // class to uniquely identify the lines of this graph from other path elements in svg
                 });
 
             // Transition line into place
             chartG.selectAll("path.chart-line")
-                .data([data])
+                // .data([data])
+                .data(data)
                 .transition()
                 .attr({
                     "d" : function (d, i) { // Draw line
@@ -494,7 +521,7 @@ define(["d3"], function(d3) {
          * Plot Scatter chart
          *
          */
-        var plotScatterChat = function () {
+        var plotScatterChart = function () {
             // Just plot only dots
             plotDots();
         }
@@ -522,7 +549,7 @@ define(["d3"], function(d3) {
                 
                 // Draw path with area data
                 chartG.selectAll("path.chart-area")
-                    .data([data])
+                    .data(data)
                     .enter()
                     .append("path")
                     .attr({
@@ -530,15 +557,14 @@ define(["d3"], function(d3) {
                     })
                     .style({
                         "fill" : function (d, i) {
-                            return "red";
-                            // return _colors(i);
+                            return colors(i);
                         },
-                        "opacity" :  "0.3"
+                        "opacity" :  "0.2"
                     });
 
                 // Handle transition
                 chartG.selectAll("path.chart-area")
-                    .data([data])
+                    .data(data)
                     .transition()
                     .attr({
                         "d" : function (d, i) {
@@ -548,16 +574,7 @@ define(["d3"], function(d3) {
                     
             }
             
-            /*  
-            if (data instanceof Array) {
-                data.forEach(function (data, index) {
-                    drawArea(data);
-                });
-            } else {
-            */
-                drawArea(data);
-//            }
-            
+            drawArea(data);
         }
         
         /**
@@ -568,7 +585,7 @@ define(["d3"], function(d3) {
             
             // r range
             if (scales.r) {
-                scales.r.range([0, canvasWidth()]);
+                scales.r.range([5, 15]);
             }
             
             var dots = function (dt) {
@@ -581,8 +598,11 @@ define(["d3"], function(d3) {
                         })
                         .style({
                             "stroke" : function (d, i) {
-                                return "red";
-                                // return _colors(index);
+                                return colors(i);
+                            },
+                            // Fill if r scale is available
+                            "fill" : function (d, i) {
+                                return (scales.r) ? colors(i) : "";
                             }
                         });
 
@@ -606,14 +626,7 @@ define(["d3"], function(d3) {
                         });
             }
 
-            if (data instanceof Array) {
-                // Loop through data in the form of an array of arrays of each line objects' points
-                data.forEach(function (data, index) {
-                    dots(data);
-                });
-            } else {
-                dots(data);
-            }
+            dots(data);
         }
         
         // Return chart object

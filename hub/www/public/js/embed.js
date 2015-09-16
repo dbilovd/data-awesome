@@ -22,8 +22,14 @@
             }
         }
         
+        // iFrameResizer.min.js
+        var iFrameResizer = document.createElement("script");
+        iFrameResizer.src = "http://da-hub.local.dev/js/lib/iframeResizer.js"
+        iFrameResizer.async = true;
+        
         var entry = document.getElementsByTagName("script")[0];
         entry.parentNode.insertBefore(script, entry);
+        entry.parentNode.insertBefore(iFrameResizer, entry);
 	})(function () {
     	// Use require.js to run embed app
         console.log("require js loaded");
