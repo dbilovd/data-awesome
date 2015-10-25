@@ -10,32 +10,32 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
     //      [5, 20], [480, 90], [250, 50], [100, 33], [330, 95], [410, 12], [475, 44], [25, 67], [85, 21],
     //      [220, 88],
     // ];
-    
+
     // jQuery no conflict
     ajq = $.noConflict();
 
     var parseDateY = d3.time.format("%Y").parse;
-    
+
     var Awesome = {
-        
+
         // Query for graph
         QUERY : {
             type : "bar", // default graph type bar
         },
         // SVG DOM container selection
         canvas : null,
-        
+
         // Scales
         xScale : null,
         yScale : null,
-        
+
         // App entry point
         start : function () {
             // Select dom container
             if (!this.canvas) {
                 this.canvas = d3.select("#da-preview-canvas");
             }
-            
+
             // Set defaulfs
             this.QUERY = {
                 "type" : "bar",
@@ -44,7 +44,7 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                 "area" : false,
                 "r" : false
             };
-            
+
             // Initialise defaults from graph
             try {
                 if ($("#w_data_query").length > 0) {
@@ -56,10 +56,10 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                 console.log(e);
                 return;
             }
-            
+
             // references to 'this' for callback functions
             var self = this;
-            
+
             // Initialise data
             self.dataInit(function (data) {
                 //var baseKey;
@@ -91,52 +91,52 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                     option.text = dataKeys[i];
                     fieldChoiceSelect.appendChild(option);
                 }
-                
-                
+
+
                 // Register callback events
                 $('#fieldChoiceSelect').on("change", function (e) {
                     baseKey = dataKeys[e.target.value];
-                    console.log(nest(data)); 
+                    console.log(nest(data));
                 });
-                
+
                 // default base key = first var
                 baseKey = dataKeys[0];
-                
+
                 var keyFunction = function (d, i) {
                     return d[baseKey];
                 }
-                
-                
+
+
                 var nest = function (data) {
                     return d3.nest()
                         .key(keyFunction)
                         .entries(data);
                 }
-                
+
                 var nestedData = nest(data);
                 console.log(nestedData);
-                
+
                 data.forEach(function (d, i) {
                     // console.log(d3.keys(d));
                     d["x"] = new Date(d.Year, 0, 1);
                     d["y"] = d.Urban;
                 });
-                
+
                 // Build graph
                 self.chart({
                     "data" : data
                 });
-                
+
                 */
-                
-                
+
+
                 /**
                  * new data pre-processor
                  */
                 console.log(data);
                 var dataKeys = d3.keys(data[0]); // from first object in array
                 console.log(dataKeys);
-                
+
                 // new data map
                 var dataMap = data.map(function (d) {
                     var toReturn = {}; // Object to replace existing d in data
@@ -153,13 +153,13 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                             // Convert all others as Numbers
                             mapItem = +mapItem;
                         }
-                        
+
                         toReturn[i] = mapItem;
                     }
-                    
+
                     return toReturn;
                 });
-                
+
                 // function to select one column of data as y
                 var dataColumn = function (data, column) {
                     return data.map(function (d) {
@@ -176,13 +176,13 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                        }
                     });
                 }
-                
+
                 var dataToPlot = [];
                 var xMax = 0,
                     xMin,
                     yMax = 0,
                     yMin = 0;
-                
+
                 for (var i = 0; i < dataKeys.length; i++) {
                     if (i > 0) {
                         var datum = dataColumn(dataMap, i);
@@ -203,13 +203,13 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                         }));
                     }
                 }
-                
+
                 self.data.data = data = dataToPlot;
                 console.log(self.data);
-                
+
                 xScale = d3.time.scale().domain([xMin, xMax]);
                 yScale = d3.scale.linear().domain([yMin, yMax]);
-                
+
                 // Build graph
                 self.QUERY.showDots = false;
                 self.chart({
@@ -217,14 +217,14 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                     "x" : xScale,
                     "y" : yScale,
                 });
-                
+
             });
-            
+
             /**
              * Events Listeners
              *
              */
-            
+
             // on Form Submit
             $("#widget-form").submit(function (e) {
                 // Set query string to form to be saved on server
@@ -248,29 +248,29 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
             });
 
         },
-        
-        // Chart 
+
+        // Chart
         chart : function (options) {
             // options have to be available even just as an empty object
             options = (!options) ? {} : options;
-            
+
             // Initialise and render chart
             var chart = AwesomeChart();
-            
+
             if (this.width) {
                 chart.width(this.width);
             }
-            
+
             if (this.height) {
                 chart.height(this.height);
             }
-            
+
             // Attach data
             if (options.data) {
                 // Attach data from options
                 var data = options.data;
                 chart.data(data);
-                
+
                 // Configure scales
                 // Testing with time scale for Year field
                 // @TODO this should be done authomatically
@@ -293,11 +293,11 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                         }))])
                     );
                 }
-                
+
                 if (options.type == "scatter") {
                     this.QUERY.r = true;
                 }
-            
+
                 // Setup r scale for 'scatter' diagram
                 if (options.r || this.QUERY.r) {
                     chart.r(d3.scale.linear()
@@ -305,21 +305,26 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                             return d.y;
                         })));
                 }
-                
+
             }
-            
+
             // Set type of chart
             if (options.type) {
                 // show dots on line, line-area and scatter charts
                 if (options.type == "line" || options.type == "line-area") {
                      this.QUERY.showDots = true;
                 }
-                
+
                 chart.chart(options.type);
             } else if (this.QUERY) {
                 chart.chart(this.QUERY.type);
             }
-            
+
+            // Pie/Arc radiuses
+            if (options.type == 'pie') {
+                chart.radius(200).innerRadius(50);
+            }
+
             // Set all other rendering options for chart
             chart.options(this.QUERY);
             // remove existing svg in canvas
@@ -334,7 +339,7 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
          */
         dataInit : function (callback) {
             var self = this;
-            
+
             // Initialise data from dataset file and set data object
             try {
                 // check for data-file
@@ -386,7 +391,7 @@ define(["jquery", "d3", "app-d3"], function($, d3, AwesomeChart) {
                         // Load JSON data by default
                         d3.json(self.data.file, dataLoaded);
                     }
-                    
+
                 } else {
                     // Throw exception
                     throw "noDataFileFound";

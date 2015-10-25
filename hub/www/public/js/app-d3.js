@@ -29,6 +29,9 @@ define(["d3"], function(d3) {
                 y : "",
                 r : ""
             },
+            // radius
+            radius,
+            innerRadius = 0,
             data, // Data
             options = {}, // Chart options
             // Default chart to plot: Bar
@@ -102,7 +105,7 @@ define(["d3"], function(d3) {
             margins[margin] = value;
             return chart;
         }
-        
+
         /**
          *
          *
@@ -112,11 +115,11 @@ define(["d3"], function(d3) {
             colors = c;
             return chart;
         }
-        
+
         /**
          * scales
          */
-        
+
 
         /**
          * chart.x
@@ -126,7 +129,7 @@ define(["d3"], function(d3) {
             scales.x = s;
             return chart;
         }
-        
+
         /**
          * chart.scale.y
          *
@@ -136,7 +139,7 @@ define(["d3"], function(d3) {
             scales.y = s;
             return chart;
         }
-        
+
         /**
          * chart.scale.r
          *
@@ -146,7 +149,25 @@ define(["d3"], function(d3) {
             scales.r = s;
             return chart;
         }
-        
+
+        /**
+         * Radius
+         */
+        chart.radius = function (r) {
+            if (!arguments.length) return radius;
+            radius = r;
+            return chart;
+        }
+
+        /**
+         * innerRadius
+         */
+        chart.innerRadius = function (iR) {
+            if (!arguments.length) return innerRadius;
+            innerRadius = iR;
+            return chart;
+        }
+
         /**
          * chart.data
          *
@@ -156,7 +177,7 @@ define(["d3"], function(d3) {
             data = d;
             return chart;
         }
-        
+
         /**
          *
          *
@@ -166,7 +187,7 @@ define(["d3"], function(d3) {
             options = o;
             return chart;
         }
-        
+
         /**
          * chart.chart
          * type of chart to plot
@@ -176,20 +197,20 @@ define(["d3"], function(d3) {
             chartType = c;
             return chart;
         }
-        
+
         /**
          * Internal calculation's functions based on chart settings
          *
          */
-        
+
         /**
          * canvasWidth
          * (width - (margins.right + margins.left))
          */
         var canvasWidth = function () {
-            return width - (margins.left + margins.right);   
+            return width - (margins.left + margins.right);
         }
-        
+
         /**
          * canvasHeight
          * (height - (margins.top + margins.bottom))
@@ -197,14 +218,14 @@ define(["d3"], function(d3) {
         var canvasHeight = function () {
             return height - (margins.top + margins.bottom);
         }
-        
+
         /**
          * x in (x, y) = (0, 0)
          */
         var xStart = function () {
             return margins.left;
         }
-        
+
         /**
          * x in (x, y) = (n, n)
          */
@@ -218,25 +239,25 @@ define(["d3"], function(d3) {
         var yStart = function () {
             return height - margins.bottom;
         }
-        
+
         /**
          * y in (x, y) = (n, n)
          */
         var yEnd = function () {
             return margins.top;
         }
-        
+
         /**
          * Rendering
          *
          */
-        
+
         /**
          * public render function
          * NB: This should be called last because it doesn't return an instance of the chart object
          */
         chart.render = function (selection) {
-            
+
             // Create SVG element
             if (!svg) {
                 svg = selection.append("svg")
@@ -244,19 +265,19 @@ define(["d3"], function(d3) {
                         "height" : height,
                         "width" : width
                     });
-                
+
                 // Render axes
                 // @Todo: make this configurable
                 renderAxes(svg);
-                
+
                 // Render clip path. All canvas drawings would be done on this protruding elements will be clipped
                 renderCanvasClipPath(svg);
             }
-            
+
             // Finally Render chart
             renderChart(svg);
         }
-        
+
         /**
          * render axes
          *
@@ -265,13 +286,13 @@ define(["d3"], function(d3) {
             // Render axis in a g element
             var axesG = svgElement.append("g")
                 .attr("class", "axes");
-            
+
             // Render x axis
             renderXAxis(axesG);
             // Render y axis
             renderYAxis(axesG);
         }
-        
+
         /**
          * render x axis inside an svg element
          *
@@ -279,13 +300,13 @@ define(["d3"], function(d3) {
         var renderXAxis = function (svgElement) {
             // Add range to scale at this point
             scales.x.range([0, canvasWidth()]);
-            
+
             // Number of ticks
             var ticks = function () {
                 var ticks = Math.max(canvasWidth() / (data.length * 4), 2);
                 return ticks;
             };
-            
+
             // Axis
             var xAxis = d3.svg.axis()
                 .scale(scales.x) // Use x scale
@@ -296,7 +317,7 @@ define(["d3"], function(d3) {
                     // return in time format
                     return d3.time.format("%Y")(d);
                 });
-            
+
             // Draw
             svgElement.append("g")
                 .attr({
@@ -304,7 +325,7 @@ define(["d3"], function(d3) {
                     "transform" : "translate (" + xStart() + "," + yStart() + ")"
                 })
                 .call(xAxis);
-            
+
             // Grid lines
             svgElement.selectAll("g.x-axis .tick")
                 .append("line")
@@ -316,7 +337,7 @@ define(["d3"], function(d3) {
                     "y1" : - canvasHeight(),
                 });
         }
-        
+
         /**
          * render y axis inside an svg element
          *
@@ -324,13 +345,13 @@ define(["d3"], function(d3) {
         var renderYAxis = function (svgElement) {
             // yAxis
             scales.y.range([canvasHeight(), 0]);
-            
+
             // Number of ticks
             var ticks = function () {
                 var ticks = Math.max(canvasHeight() / (data.length * 4), 2);
                 return ticks;
             };
-            
+
             var yAxis = d3.svg.axis()
                 .scale(scales.y)
                 .orient("left")
@@ -356,10 +377,10 @@ define(["d3"], function(d3) {
                     "y1" : 0,
                 });
         }
-        
+
         /**
          * private render chart canvas drawable area (clip path)
-         * 
+         *
          */
         var renderCanvasClipPath = function (svgElement) {
             // Render clip path inside svgElement
@@ -377,7 +398,7 @@ define(["d3"], function(d3) {
                     "y" : 0
                 });
         }
-        
+
         /**
          * renderChart
          *
@@ -392,7 +413,7 @@ define(["d3"], function(d3) {
                         "clip-path" : "clippath", // Reference clip path defined with renderCanvasClipPath
                     });
             }
-            
+
             // Call chart functions based on chartType
             switch (chartType) {
                 // line
@@ -402,22 +423,27 @@ define(["d3"], function(d3) {
                         plotDots();
                     }
                     break;
-                    
+
                 // line-area
                 case "line-area" :
                     plotLineChart(); // plot line
                     plotArea(); // Show area
-                    
+
                     if (options.showDots) {
                         plotDots();
                     }
                     break;
-                    
+
                 // scatter
                 case "scatter" :
                     plotScatterChart();
                     break;
-                    
+
+                // Pie
+                case "pie" :
+                    plotPieChart();
+                    break;
+
                 // bar (default)
                 case "bar":
                 default :
@@ -425,20 +451,20 @@ define(["d3"], function(d3) {
                     break;
             }
         }
-        
+
         /**
          * Actual chart plots
          *
          */
-        
+
         /**
          * plot bar chart
          */
         var plotBarChart = function () {
-            
+
             // Padding between bars
             var barPadding = 2;
-            
+
             var bars = function (dt, index) {
                 // Plot graph into chart g element
                 chartG.selectAll("rect.bars.bars_" + index)
@@ -477,18 +503,18 @@ define(["d3"], function(d3) {
                     .transition()
                     .attr(attrs);
             }
-            
+
             data.forEach(function (d, i) {
                 bars(d, i);
             });
         }
-        
+
         /**
          * Plot Line Chart
          *
          */
         var plotLineChart = function () {
-            
+
             // NB: Axis should have ran already, so x and y have a range, since those are not suplied at start
             // Draw a line with each x, y point calculate using x and y scales
             var line = d3.svg.line()
@@ -501,7 +527,7 @@ define(["d3"], function(d3) {
                     } else { // For stacked data
                         var y = scales.y(d.y + d.y0);
                     }
-                    
+
                     return y;
                 })
                 .interpolate("linear");
@@ -531,7 +557,7 @@ define(["d3"], function(d3) {
                     }
                 });
         }
-        
+
         /**
          * Plot Scatter chart
          *
@@ -540,13 +566,13 @@ define(["d3"], function(d3) {
             // Just plot only dots
             plotDots();
         }
-        
+
         /**
          * Plot Areas
          *
          */
         var plotArea = function () {
-            
+
             var drawArea = function (data) {
                 // Area generation function
                 var area = d3.svg.area()
@@ -561,7 +587,7 @@ define(["d3"], function(d3) {
                             return scales.y(d.y0 + d.y1);
                         }
                     });
-                
+
                 // Draw path with area data
                 chartG.selectAll("path.chart-area")
                     .data(data)
@@ -586,25 +612,25 @@ define(["d3"], function(d3) {
                             return area(d);
                         }
                     });
-                    
+
             }
-            
+
             drawArea(data);
         }
-        
+
         /**
          * Plot Dots
          *
          */
         var plotDots = function () {
-            
+
             // r range
             if (scales.r) {
                 scales.r.range([5, 15]);
             }
-            
+
             var dots = function (dt, index) {
-                
+
                 chartG.selectAll("circle.dots.dots_" + index)
                     .data(dt)
                     .enter()
@@ -642,14 +668,107 @@ define(["d3"], function(d3) {
                         }
                     });
             }
-            
+
             // Plot each data as a line
             data.forEach(function (d, i) {
                 dots(d, i);
             });
-        
+
         }
-        
+
+        /**
+         *
+         *
+         */
+        var plotPieChart = function () {
+            console.log("ploting pie chart with data");
+
+
+
+            function renderPie(dt, radius) {
+                var pie = d3.layout.pie()
+                    .sort(function (d) {
+                        return d.x;
+                    })
+                    .value(function (d) {
+                        return d.y;
+                    });
+
+                var arc = d3.svg.arc()
+                    .outerRadius(radius)
+                    .innerRadius(innerRadius);
+
+                //var pieG = chartG.selectAll("g.pie");
+                //if (!pieG.length) {
+                    //console.log("in side");
+                    var pieG = chartG.append("g")
+                        .attr({
+                            "class" : "pie"
+                        });
+                //}
+                //console.log("outside");
+
+                pieG.attr({
+                    "transform" : function (d, i) {
+                        return "translate(" + radius + "," + radius + ")";
+                    }
+                });
+
+                renderSlices(pieG, pie, arc, dt);
+            }
+
+            function renderSlices(svgElement, pie, arc, dt) {
+                var slices = svgElement.selectAll("path.arc")
+                    .data(pie(dt)); // <-B
+
+                slices.enter()
+                    .append("path")
+                    .attr("class", "arc")
+                    .attr("fill", function (d, i) {
+                        return colors(i);
+                    });
+
+                slices.transition()
+                    .attrTween("d", function (d) {
+                        var currentArc = this.__current__; // <-C
+
+                        if (!currentArc) {
+                            currentArc = {
+                                startAngle: 0,
+                                endAngle: 0
+                            };
+                        }
+
+                        var interpolate = d3.interpolate(currentArc, d);
+
+                        this.__current__ = interpolate(1);//<-D
+
+                        return function (t) {
+                            return arc(interpolate(t));
+                        };
+                    });
+            }
+
+            var radiusScale = d3.scale.linear()
+                .domain([innerRadius, radius]);
+
+            var max = 0;
+            data.forEach(function (d, i) {
+                max = Math.max(max, d3.max(d, function (d, i){
+                    return d.y;
+                }));
+            });
+
+            radiusScale.range([0, max]);
+
+            console.log(radiusScale(100));
+
+            data.forEach(function (d, i) {
+                var r = (radius / 3);
+                // renderPie(d);
+            });
+        }
+
         // Return chart object
         return chart;
     }
