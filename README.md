@@ -25,10 +25,11 @@ Because we believe many many more Ghanaians need to get access to these Open Dat
 * LAMP stack (PHP, MySQL and Apache)
 * R
 * R packages: ggplot2, lubridate, jsonline, reshape2
- 
+
 ##### Running
 
 1. Clone this repo into your htdocs folder so that you can access the php_d folder at http://localhost/php_d
 2. Visit http://localhost/php_d/upload.php to test.
 
-*PS:* Your server should have write permissions over the /php_d/uploads folder.
+
+*PS: Your server should have write permissions over the /php_d/uploads folder.*
