@@ -15,6 +15,10 @@ button.button {
     margin-bottom: 0;
 }
 
+label.label-small {
+    font-weight: normal;
+}
+
 form .row {
     margin-bottom: 20px;
 }
@@ -127,8 +131,14 @@ footer .container {
 
 .da-column-header {
     border-bottom: 1px solid #E7E7E7;
+    /*
     padding-top: 10px;
     text-align: center;
+    */
+}
+
+#da-configure {
+    /*border-bottom: 1px solid #E7E7E7;*/
 }
 
 .da-widget-form {

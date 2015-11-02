@@ -4,6 +4,7 @@
         <title> @yield('head.title') : Data-Awesome </title>
 
         <!-- Stylesheets -->
+        <!-- <link rel="stylesheet" type="text/css" href="<?php  echo asset("css/bootstrap.css"); ?>"> -->
         <link href="<?php echo asset("css/skeleton.css"); ?>" rel="stylesheet" type="text/css" />
         <link href="<?php echo asset("css/normalize.css"); ?>" rel="stylesheet" type="text/css" />
         <!-- fonts and icons-->
@@ -136,5 +137,11 @@
 
         @show
 
+
+        <!-- Scripts -->
+        <!--
+        <script type="text/javascript" src="<?php echo asset("js/lib/jquery-1.11.2.js"); ?>"></script>
+        <script type="text/javascript" src="<?php echo asset("js/bootstrap.js"); ?>"></script>
+        -->
     </body>
 </html>

@@ -200,6 +200,34 @@ class WidgetController extends Controller
     }
 
     /**
+     * Display the embed code for this widget.
+     *
+     * @param  string  $username
+     * @param  int  $widget_id
+     * @return Response
+     */
+    public function show_embed_codes ($username, $widget_id) {
+        // Get widget owner
+        $owner = User::where("name", $username) -> first();
+        if ($owner) {
+
+            // Fetch widget by owner
+            $widget = Widget::where("owner", $owner -> id)
+                -> where("id", $widget_id)
+                -> first();
+
+            if ($widget) {
+                return view("app.widget-codes")
+                    -> with("owner", $owner)
+                    -> with("widget", $widget);
+            }
+        }
+
+        // Throw 404 error
+        abort(404);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id

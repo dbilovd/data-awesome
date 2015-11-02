@@ -46,14 +46,19 @@
                     enctype="multipart/form-data" >
 
                     <div class="row">
-                        <div class="three columns">
-                            <div class="da-column-header">
-                                <h5> Configure </h5>
+                        <div class="twelve columns" id="da-configure">
+                            <div class="row da-column-header">
+                                <div class="one-half column">
+                                    <h5> Configure </h5>
+                                </div>
+                                <div class="one-half column">
+                                    <button id="w-save-widget" type="submit" class="button button-primary u-pull-right"> Save Widget </button>
+                                </div>
                             </div>
                             <div class="da-widget-graph-form">
                                 <div class="row">
-                                    <div class="twelve columns">
-                                        <label> Type of graph </label>
+                                    <div class="three columns">
+                                        <label> Type of Graph </label>
                                         <?php
                                         $chart_types = array("bar" => "Bar Chart",
                                             "scatter" => "Scatter Diagram",
@@ -72,44 +77,46 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                </div>
-                                <!-- Show dots -->
-                                <div class="row" id="wc-graph-dots">
-                                    <div class="twelve columns">
-                                        <label  class="u-full-width">
-                                            <input type="checkbox" id="w-graph-dots" /> Show dots
-                                        </label>
-                                    </div>
-                                </div>
-                                <!-- Show labels -->
-                                <div class="row" id="wc-graph-labels">
-                                    <div class="twelve columns">
-                                        <label  class="u-full-width">
-                                            <input type="checkbox" id="w-graph-labels" /> Show labels
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <!-- Misc -->
-                                <div class="row">
-                                    <div class="twelve columns" id="additional-fields">
+                                    <!-- Misc -->
+                                    <div class="three columns" id="wc-graph-misc">
+                                        <label class="u-full-width"> Misc </label>
+                                        <!-- Show dots -->
+                                        <div id="wc-graph-dots">
+                                            <label class="label-small">
+                                                <input type="checkbox" id="w-graph-dots" /> Show dots
+                                            </label>
+                                        </div>
+                                        <!-- Show labels -->
+                                        <div id="wc-graph-labels">
+                                            <label class="label-small">
+                                                <input type="checkbox" id="w-graph-labels" /> Show labels
+                                            </label>
+                                        </div>
+                                        
+                                        <!-- Misc -->
+                                        <!-- <div class="three columns" id="additional-fields">
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="twelve columns">
+                            <ul class="nav nav-tabs">
+                                <li>
+                                    <a href="/"> Dataset </a>
+                                </li>
+                                <li class="active">
+                                    <a href="#widget-preview"> Preview </a>
+                                </li>
+                            </ul>
 
-                        <div class="nine columns">
-                            <div class="row da-column-header">
-                                <div class="one-half column">
-                                    <h5> Preview </h5>
-                                </div>
-                                <div class="one-half column">
-                                    <button id="w-save-widget" type="submit" class="button button-primary u-pull-right"> Save Widget </button>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="twelve columns">
-                                    <div id="da-preview-canvas" class="da-preview-canvas da-text-center"> </div>
+                                    <div id="widget-preview">
+                                        <div id="da-preview-canvas" class="da-preview-canvas da-text-center"> </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -1,7 +1,7 @@
 
 @extends("layouts.base")
 
-@section("head.title", "Widgets by " . $owner -> name)
+@section("head.title", $widget -> title)
 
 
 @section("body.subheader")
@@ -18,6 +18,9 @@
                         <a >{{ $widget -> id }}</a>
 
                         <span style="float: right;">
+                            <a class="button" href="{{ route('get-widget-code', [ 'username' => $owner -> name, 'widget' => $widget -> id ]) }}"> 
+                                Get Embed Codes
+                            </a>
                             <a class="button" href="{{ route('edit-widget-graph', [ 'widget' => $widget -> id ]) }}"> 
                                 Edit graph 
                             </a>

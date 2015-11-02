@@ -80,6 +80,7 @@ Route::get("widget/{widget}/graph", [
 	"middleware" => "auth",
 	"uses" => "WidgetController@create_graph"
 ]);
+
 // Save widget graph settings
 Route::post("widget/{widget}/graph", [
 	"as" => "save-widget-graph",
@@ -119,4 +120,10 @@ Route::get("/{username}/widgets", [
 Route::get("/{username}/widgets/{widget}", [
 	"as" => "widget",
 	"uses" => "WidgetController@show"
+]);
+// widget codes
+Route::get("/{username}/widgets/{widget}/embed", [
+	"as" => "get-widget-code",
+	"middleware" => "auth",
+	"uses" => "WidgetController@show_embed_codes"
 ]);

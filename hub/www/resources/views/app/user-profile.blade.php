@@ -44,7 +44,7 @@
                   @endforeach
               </ul>
           @else
-              <a href="{{ route('create-data') }}" title="Create a new data set"> You haven't uploaded any data set yet </a>
+              <a href="{{ route('create-dataset') }}" title="Create a new data set"> You haven't uploaded any data set yet </a>
           @endif
 
           <hr />
