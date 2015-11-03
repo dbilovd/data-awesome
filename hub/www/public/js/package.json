@@ -1,0 +1,29 @@
+{
+  "name": "data-awesome",
+  "version": "0.1.0",
+  "description": "Data Awesome Hub JS Apps",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbilovd/data-awesome.git"
+  },
+  "keywords": [
+    "Data",
+    "Visualisations",
+    "Ghana"
+  ],
+  "author": "David Lartey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dbilovd/data-awesome/issues"
+  },
+  "homepage": "https://github.com/dbilovd/data-awesome#readme",
+  "dependencies": {
+    "backbone.marionette": "^2.4.3",
+    "clipboard": "^1.5.3",
+    "jquery": "^2.1.4"
+  }
+}

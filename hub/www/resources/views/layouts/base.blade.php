@@ -138,6 +138,11 @@
         @show
 
 
+        @section("footer.scripts")
+
+        @show
+
+
         <!-- Scripts -->
         <!--
         <script type="text/javascript" src="<?php echo asset("js/bootstrap.js"); ?>"></script>

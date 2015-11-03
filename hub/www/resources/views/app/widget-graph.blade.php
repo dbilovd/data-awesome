@@ -103,14 +103,11 @@
                     </div>
                     <div class="row">
                         <div class="twelve columns">
-                            <ul class="nav nav-tabs">
-                                <li>
-                                    <a href="/"> Dataset </a>
-                                </li>
-                                <li class="active">
-                                    <a href="#widget-preview"> Preview </a>
-                                </li>
-                            </ul>
+                            <div class="row da-column-header">
+                                <div class="one-half column">
+                                    <h5> Preview </h5>
+                                </div>
+                            </div>
 
                             <div class="row">
                                 <div class="twelve columns">
@@ -136,6 +133,7 @@
 
 @endsection
 
-@section ("head.scripts")
-    <script type="text/javascript" src="<?php echo asset("js/lib/require.js"); ?>" data-main="/js/main"></script>
+@section ("footer.scripts")
+    <!-- <script type="text/javascript" src="<?php echo asset("js/lib/require.js"); ?>" data-main="/js/main"></script> -->
+    <script type="text/javascript" src="<?php echo asset("js/build/app.js"); ?>"></script>
 @endsection
