@@ -122,6 +122,18 @@ footer .container {
     text-align: center;
 }
 
+.code-block {
+    margin-bottom: 30px;
+    padding: 10px;
+    border: 1px solid #eeeeee;
+    border-radius: 4px;
+}
+
+.code-block > pre {
+    margin: 0;
+    margin-bottom: 10px;
+}
+
 /**
  * DA
  */

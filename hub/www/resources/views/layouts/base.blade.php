@@ -140,8 +140,29 @@
 
         <!-- Scripts -->
         <!--
-        <script type="text/javascript" src="<?php echo asset("js/lib/jquery-1.11.2.js"); ?>"></script>
         <script type="text/javascript" src="<?php echo asset("js/bootstrap.js"); ?>"></script>
         -->
+        <script type="text/javascript" src="<?php echo asset("js/lib/jquery-1.11.2.js"); ?>"></script>
+        <script type="text/javascript" src="<?php echo asset("js/clipboard.js"); ?>"></script>
+        <script type="text/javascript">
+        var clipboard = new Clipboard(".btn.clip", {
+            text : function (trigger) {
+                return $(trigger).parent().find("code").first().text();
+            }
+        });
+        // Events
+        clipboard.on("success", function (e) {
+            $(e.trigger).text("Copied!");
+            window.setTimeout(function (trigger) {
+                $(trigger).text("Copy to Clipboard");
+            }, 2000, e.trigger);
+        });
+        clipboard.on("error", function (e) {
+            $(e.trigger).text("Copying Failed. Try later.");
+            window.setTimeout(function (trigger) {
+                $(trigger).text("Copy to Clipboard");
+            }, 2000, e.trigger);
+        });
+        </script>
     </body>
 </html>

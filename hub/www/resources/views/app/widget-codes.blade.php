@@ -43,17 +43,22 @@
                     <h5> Embed as a Javascript Library </h5>
 
                     <div id="embed-code-js">
-<pre><code><?php echo htmlspecialchars('<div class="data-awesome-widget" data-widget-id="' . $widget -> id .'"> </div>'); ?></code></pre>
+                        <div class="code-block">
+                            <pre><code><?php echo htmlspecialchars('<div class="data-awesome-widget" data-widget-id="' . $widget -> id .'"> </div>'); ?></code></pre>
+                            <button class="btn clip">Copy to Clipboard</button>
+                        </div>
 
-<pre><code>(function () {
+                        <div class="code-block">
+                            <pre><code>(function () {
     var script = document.createElement("script");
     script.src = "<?php echo url("/"); ?>/js/embed.js";
     script.async = true;
 
     var entry = document.getElementsByTagName("script")[0];
     entry.parentNode.insertBefore(script, entry);
-})();
-</code></pre>
+})();</code></pre>
+                            <button class="btn clip">Copy to Clipboard</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,9 +67,11 @@
             <div class="row">
                 <div class="twelve columns">
                     <h5> Embed into Wordpress </h5>
-                    <div id="embed-code-iframe">
-<pre><code>[dawesome widget="{{ $widget -> id }}" ]
-</code></pre>
+                    <div id="embed-code-wp">
+                        <div class="code-block">
+                            <pre><code>[dawesome widget="{{ $widget -> id }}" ]</code></pre>
+                            <button class="btn clip">Copy to Clipboard</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -74,7 +81,10 @@
                 <div class="twelve columns">
                     <h5> Embed as an Image </h5>
                     <div id="embed-code-img">
-                        <pre><code>Embed as an Image</code></pre>
+                        <div class="code-block">
+                            <pre><code>Embed as an Image</code></pre>
+                            <button class="btn clip">Copy to Clipboard</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,7 +94,10 @@
                 <div class="twelve columns">
                     <h5> Embed iFrame </h5>
                     <div id="embed-code-iframe">
-                        <pre><code>Copy iFrame directly</code></pre>
+                        <div class="code-block">
+                            <pre><code>Copy iFrame directly</code></pre>
+                            <button class="btn clip">Copy to Clipboard</button>
+                        </div>
                     </div>
                 </div>
             </div>
